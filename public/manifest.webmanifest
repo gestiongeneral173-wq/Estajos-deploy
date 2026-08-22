@@ -1,0 +1,31 @@
+{
+  "id": "/",
+  "name": "ESTAJOS",
+  "short_name": "ESTAJOS",
+  "description": "Partes de campo y control de estajos: furgonetas, jornadas y pagos.",
+  "lang": "es",
+  "dir": "ltr",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EEF1F4",
+  "theme_color": "#FFFFFF",
+  "icons": [
+    { "src": "/favicon.svg", "type": "image/svg+xml", "sizes": "any", "purpose": "any" },
+    { "src": "/iconos/icono-192.png", "type": "image/png", "sizes": "192x192", "purpose": "any" },
+    { "src": "/iconos/icono-512.png", "type": "image/png", "sizes": "512x512", "purpose": "any" },
+    {
+      "src": "/iconos/icono-recortable-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/iconos/icono-recortable-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ]
+}
