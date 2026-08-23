@@ -35,8 +35,16 @@ export function NuevoVehiculoModal({ open, onClose, onSave }) {
   return (
     <Sheet open={open} title="Nuevo Vehículo" onClose={onClose}>
       <div className="space-y-4">
-        <Input label="Nombre *" value={form.nombre} onChange={campo("nombre")} />
-        <Input label="Matrícula (opcional)" value={form.matricula} onChange={campo("matricula")} />
+        <Input
+          label="Nombre *"
+          value={form.nombre}
+          onChange={campo("nombre")}
+        />
+        <Input
+          label="Matrícula (opcional)"
+          value={form.matricula}
+          onChange={campo("matricula")}
+        />
         <Input
           label="Plazas totales"
           type="number"
@@ -59,7 +67,11 @@ export function NuevoVehiculoModal({ open, onClose, onSave }) {
         <p className="text-[11px] text-gray-500 -mt-2">
           Ciclo de pago: Quincenal (fijo, no editable).
         </p>
-        <Button variant="primary" disabled={!form.nombre || !tarifaValida} onClick={guardar}>
+        <Button
+          variant="primary"
+          disabled={!form.nombre || !tarifaValida}
+          onClick={guardar}
+        >
           Guardar
         </Button>
       </div>

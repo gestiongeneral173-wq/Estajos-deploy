@@ -4,7 +4,12 @@ import { JornadaModal } from "./JornadaModal.jsx";
 import { PersonaPicker } from "./PersonaPicker.jsx";
 import { TemporalModal } from "./TemporalModal.jsx";
 import { CodeBadges } from "../components/ui/Badges.jsx";
-import { Button, Card, Num, SectionTitle } from "../components/ui/primitives.jsx";
+import {
+  Button,
+  Card,
+  Num,
+  SectionTitle,
+} from "../components/ui/primitives.jsx";
 import { nombrePersona } from "./useCampo.js";
 import { rosterToList } from "../lib/calculos.js";
 import { formatFecha, hoy, idLocal } from "../lib/format.js";
@@ -42,7 +47,9 @@ export function NuevoRegistroWizard({
     // suyo, el asistente cambia de oficio y solo deja rellenar los ceros.
     parteExistente = vehiculoId ? registrosDelDia[vehiculoId] : null,
     filasDelParte = parteExistente
-      ? rosterToList(parteExistente).filter((fila) => parteExistente.horasRoles?.[fila.id])
+      ? rosterToList(parteExistente).filter(
+          (fila) => parteExistente.horasRoles?.[fila.id],
+        )
       : [],
     ocupados = useMemo(() => {
       const z = new Set();
@@ -121,6 +128,7 @@ export function NuevoRegistroWizard({
           horasRoles: q,
           temporales: temporales.map((temporal) => ({
             nombre: temporal.nombre,
+            horas: temporal.horas,
             destajo: temporal.destajo,
           })),
         });
@@ -211,7 +219,11 @@ export function NuevoRegistroWizard({
                 <p
                   className="eyebrow mb-1.5 truncate"
                   style={{
-                    color: Fe ? colors.navyDark : se ? colors.primary : colors.muted,
+                    color: Fe
+                      ? colors.navyDark
+                      : se
+                        ? colors.primary
+                        : colors.muted,
                     opacity: Fe || se ? 1 : 0.6,
                   }}
                 >
@@ -220,7 +232,11 @@ export function NuevoRegistroWizard({
                 <div
                   className="h-1 rounded-full transition-colors"
                   style={{
-                    background: se ? colors.primary : Fe ? colors.navyDark : colors.line,
+                    background: se
+                      ? colors.primary
+                      : Fe
+                        ? colors.navyDark
+                        : colors.line,
                   }}
                 />
               </div>
@@ -417,8 +433,8 @@ export function NuevoRegistroWizard({
               color: colors.muted,
             }}
           >
-            Este parte ya está enviado. No se puede rehacer: solo rellenar las horas o el destajo
-            que se quedaron en cero.
+            Este parte ya está enviado. No se puede rehacer: solo rellenar las
+            horas o el destajo que se quedaron en cero.
           </p>
           <div
             className="px-5 divide-y"
@@ -427,7 +443,8 @@ export function NuevoRegistroWizard({
             }}
           >
             {filasDelParte.map((fila) => {
-              const falta = (fila.horas ?? 0) === 0 || (fila.destajo ?? 0) === 0;
+              const falta =
+                (fila.horas ?? 0) === 0 || (fila.destajo ?? 0) === 0;
               return (
                 <button
                   key={fila.id}
@@ -472,7 +489,11 @@ export function NuevoRegistroWizard({
       {vehiculoId && !cerrado && !parteExistente && (
         <Card>
           <SectionTitle color="green">Agregar personal</SectionTitle>
-          <PersonaPicker personas={disponibles} buscador={true} onPick={elegirPersona} />
+          <PersonaPicker
+            personas={disponibles}
+            buscador={true}
+            onPick={elegirPersona}
+          />
           <button
             type="button"
             onClick={() => setModalTemporal(true)}
@@ -515,10 +536,14 @@ export function NuevoRegistroWizard({
                       color: colors.muted,
                     }}
                   >
-                    €{temporal.destajo}
+                    {temporal.horas}h · €{temporal.destajo}
                   </span>
                   <button
-                    onClick={() => setTemporales((q) => q.filter((te) => te.id !== temporal.id))}
+                    onClick={() =>
+                      setTemporales((q) =>
+                        q.filter((te) => te.id !== temporal.id),
+                      )
+                    }
                     aria-label={`Quitar a ${temporal.nombre}`}
                     className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-400 hover:text-red-500"
                   >
@@ -539,7 +564,11 @@ export function NuevoRegistroWizard({
             </p>
           )}
           {equipo.length > 0 && (
-            <Button variant="outline" className="mt-3" onClick={() => setCerrado(true)}>
+            <Button
+              variant="outline"
+              className="mt-3"
+              onClick={() => setCerrado(true)}
+            >
               Ya están todos
             </Button>
           )}
@@ -677,13 +706,14 @@ export function NuevoRegistroWizard({
       <TemporalModal
         open={modalTemporal}
         onCancel={() => setModalTemporal(false)}
-        onConfirm={(z, q) => {
-          setTemporales((te) => [
-            ...te,
+        onConfirm={(z, q, te) => {
+          setTemporales((se) => [
+            ...se,
             {
               id: idLocal(),
               nombre: z,
-              destajo: q,
+              horas: q,
+              destajo: te,
             },
           ]);
           setModalTemporal(false);

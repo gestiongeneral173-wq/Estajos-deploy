@@ -54,7 +54,10 @@ export function LoginCentral({ onCancel }) {
               strokeWidth={1.6}
             />
           </div>
-          <p className="font-semibold text-sm" style={{ color: colors.navyDark }}>
+          <p
+            className="font-semibold text-sm"
+            style={{ color: colors.navyDark }}
+          >
             Acceso de administrador
           </p>
           <p className="text-[11px] text-gray-500 text-center mt-1">
@@ -80,7 +83,10 @@ export function LoginCentral({ onCancel }) {
           />
 
           {error && (
-            <p className="text-[11px] text-center" style={{ color: colors.danger }}>
+            <p
+              className="text-[11px] text-center"
+              style={{ color: colors.danger }}
+            >
               {error}
             </p>
           )}
@@ -89,7 +95,11 @@ export function LoginCentral({ onCancel }) {
             <Button variant="outline" onClick={onCancel}>
               Cancelar
             </Button>
-            <Button variant="dark" type="submit" disabled={entrando || !correo.trim() || !password}>
+            <Button
+              variant="dark"
+              type="submit"
+              disabled={entrando || !correo.trim() || !password}
+            >
               {entrando ? "Entrando…" : "Entrar"}
             </Button>
           </div>

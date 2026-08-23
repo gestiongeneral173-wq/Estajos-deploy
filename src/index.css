@@ -27,7 +27,8 @@
 
   /* Cifras: monoespaciado tabular para que las columnas de números no bailen. */
   .cifra {
-    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-family:
+      "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
     font-variant-numeric: tabular-nums;
     letter-spacing: -0.02em;
   }

@@ -14,7 +14,13 @@ import {
   X,
 } from "lucide-react";
 import { CodeBadge } from "../../components/ui/Badges.jsx";
-import { Button, Card, Input, SectionTitle, StatCard } from "../../components/ui/primitives.jsx";
+import {
+  Button,
+  Card,
+  Input,
+  SectionTitle,
+  StatCard,
+} from "../../components/ui/primitives.jsx";
 import { calcEmpleado, calcVehiculo } from "../../lib/calculos.js";
 import { descargarCSV } from "../../lib/csv.js";
 import { ddmm, eur } from "../../lib/format.js";
@@ -105,7 +111,10 @@ export function ResumenTab({ state, actions }) {
           />
         </div>
       </Card>
-      <Card onClick={() => setAbierto((v) => !v)} className="cursor-pointer select-none">
+      <Card
+        onClick={() => setAbierto((v) => !v)}
+        className="cursor-pointer select-none"
+      >
         <div className="flex items-center justify-between mb-4">
           <SectionTitle color="gold" className="!mb-0">
             Resumen Furgonetas
@@ -200,11 +209,15 @@ export function ListasPago({ tipo, state, actions }) {
     [encargado, setEncargado] = useState(""),
     [listaAbierta, setListaAbierta] = useState(null),
     fuente = esEmpleado ? trabajadores : vehiculos,
-    base = esEmpleado ? fuente.filter((A) => A.payment_period === ciclo) : fuente,
+    base = esEmpleado
+      ? fuente.filter((A) => A.payment_period === ciclo)
+      : fuente,
     calculos = useMemo(() => {
       const A = {};
       base.forEach((H) => {
-        A[H.id] = esEmpleado ? calcEmpleado(state, H.id) : calcVehiculo(state, H.id);
+        A[H.id] = esEmpleado
+          ? calcEmpleado(state, H.id)
+          : calcVehiculo(state, H.id);
       });
       return A;
     }, [base, state, esEmpleado]),
@@ -223,7 +236,9 @@ export function ListasPago({ tipo, state, actions }) {
       0,
     ),
     listas = esEmpleado
-      ? listasEmpleados.filter((listasEmpleado) => listasEmpleado.ciclo === ciclo)
+      ? listasEmpleados.filter(
+          (listasEmpleado) => listasEmpleado.ciclo === ciclo,
+        )
       : listasFurgonetas,
     toggleSeleccion = (A) =>
       setSeleccion((H) => {
@@ -272,7 +287,10 @@ export function ListasPago({ tipo, state, actions }) {
     // Se toma la fecha más antigua de todo lo que se va a imprimir.
     desdeReal = conSaldo.reduce((minimo, h) => {
       const calculo = calculos[h.id],
-        fechas = [...(calculo.jornadas ?? calculo.dias ?? []), ...calculo.adelantos]
+        fechas = [
+          ...(calculo.jornadas ?? calculo.dias ?? []),
+          ...calculo.adelantos,
+        ]
           .map((fila) => fila.fecha)
           .filter(Boolean);
       if (fechas.length === 0) {
@@ -296,7 +314,10 @@ export function ListasPago({ tipo, state, actions }) {
           eur(calculos[h.id].totalPagar),
           "",
         ]),
-        total: conSaldo.reduce((suma, h) => suma + calculos[h.id].totalPagar, 0),
+        total: conSaldo.reduce(
+          (suma, h) => suma + calculos[h.id].totalPagar,
+          0,
+        ),
       });
     };
   return (
@@ -334,7 +355,9 @@ export function ListasPago({ tipo, state, actions }) {
         <p className="text-[11px] text-gray-500 mb-1">
           {"Período activo: "}
           {periodo.label}
-          {periodo.cerrado ? " · cerrado, listo para pagar" : " · todavía en curso"}
+          {periodo.cerrado
+            ? " · cerrado, listo para pagar"
+            : " · todavía en curso"}
         </p>
         {/* Llegar a saldo cero no hace avanzar el ciclo: hasta que alguien lo
             confirma, el sistema sigue pidiendo cobrar éste. Sin este botón el
@@ -344,12 +367,15 @@ export function ListasPago({ tipo, state, actions }) {
             <Button
               variant="outline"
               icon={<Check className="w-4 h-4" />}
-              onClick={() => actions.confirmarCiclo(esEmpleado ? ciclo : "quincenal")}
+              onClick={() =>
+                actions.confirmarCiclo(esEmpleado ? ciclo : "quincenal")
+              }
             >
               Confirmar ciclo cerrado
             </Button>
             <p className="mt-1.5 text-[11px] text-gray-500">
-              Avanza al ciclo siguiente. Sólo funciona cuando no queda nadie sin liquidar.
+              Avanza al ciclo siguiente. Sólo funciona cuando no queda nadie sin
+              liquidar.
             </p>
           </div>
         )}
@@ -361,8 +387,8 @@ export function ListasPago({ tipo, state, actions }) {
             abajo. Sin este aviso la tarjeta desaparecía sin decir por qué. */}
         {esEmpleado && ciclo === "mensual" && (
           <p className="text-[11px] text-gray-500 mb-3">
-            Las listas de pago en efectivo son solo del ciclo quincenal. A los mensuales se les paga
-            desde Escanear, uno a uno.
+            Las listas de pago en efectivo son solo del ciclo quincenal. A los
+            mensuales se les paga desde Escanear, uno a uno.
           </p>
         )}
         <div className="grid grid-cols-2 gap-3">
@@ -384,7 +410,9 @@ export function ListasPago({ tipo, state, actions }) {
           </Button>
         </div>
         {conSaldo.length === 0 && (
-          <p className="mt-2 text-[11px] text-gray-500 text-center">sin datos para exportar</p>
+          <p className="mt-2 text-[11px] text-gray-500 text-center">
+            sin datos para exportar
+          </p>
         )}
       </Card>
       {esEmpleado && ciclo === "quincenal" && (
@@ -404,7 +432,8 @@ export function ListasPago({ tipo, state, actions }) {
                 Generar lista
               </Button>
               <p className="mt-2 text-[11px] text-gray-500 text-center">
-                Selecciona a los empleados con saldo pendiente y ejecuta el pago en efectivo.
+                Selecciona a los empleados con saldo pendiente y ejecuta el pago
+                en efectivo.
               </p>
             </>
           )}
@@ -422,7 +451,9 @@ export function ListasPago({ tipo, state, actions }) {
               </div>
               {filtrados.length === 0 ? (
                 <p className="text-gray-500 text-xs text-center py-6">
-                  {q ? "Sin coincidencias." : "No hay empleados con pago pendiente."}
+                  {q
+                    ? "Sin coincidencias."
+                    : "No hay empleados con pago pendiente."}
                 </p>
               ) : (
                 <div className="border border-gray-200 rounded-xl overflow-hidden">
@@ -459,9 +490,14 @@ export function ListasPago({ tipo, state, actions }) {
                           color: colors.navyDark,
                         }}
                       >
-                        {esEmpleado ? `${filtrado.nombre} ${filtrado.apellido}` : filtrado.nombre}
+                        {esEmpleado
+                          ? `${filtrado.nombre} ${filtrado.apellido}`
+                          : filtrado.nombre}
                         {esEmpleado && (
-                          <CodeBadge code={ciclo === "mensual" ? "M" : "Q"} size={14} />
+                          <CodeBadge
+                            code={ciclo === "mensual" ? "M" : "Q"}
+                            size={14}
+                          />
                         )}
                       </span>
                       <span
@@ -484,7 +520,9 @@ export function ListasPago({ tipo, state, actions }) {
                 }}
               >
                 <span>Seleccionados ({seleccionados.length})</span>
-                <span className="text-right">€{totalSeleccionado.toFixed(2)}</span>
+                <span className="text-right">
+                  €{totalSeleccionado.toFixed(2)}
+                </span>
               </div>
               <div className="grid grid-cols-2 gap-3 mt-4">
                 <Button
@@ -515,7 +553,9 @@ export function ListasPago({ tipo, state, actions }) {
                 }}
               >
                 <span>A pagar ({seleccionados.length})</span>
-                <span className="text-right">€{totalSeleccionado.toFixed(2)}</span>
+                <span className="text-right">
+                  €{totalSeleccionado.toFixed(2)}
+                </span>
               </div>
               <Input
                 label="Nombre del encargado (quien reparte el efectivo)"
@@ -547,7 +587,9 @@ export function ListasPago({ tipo, state, actions }) {
       )}
       {esEmpleado && ciclo === "quincenal" && (
         <Card>
-          <SectionTitle color="green">Listas generadas · Quincenal</SectionTitle>
+          <SectionTitle color="green">
+            Listas generadas · Quincenal
+          </SectionTitle>
           {listas.length === 0 ? (
             <p className="text-gray-500 text-xs text-center py-4">
               Sin listas generadas en este ciclo.
@@ -561,7 +603,11 @@ export function ListasPago({ tipo, state, actions }) {
                 >
                   <button
                     className="w-full flex items-center justify-between"
-                    onClick={() => setListaAbierta(listaAbierta === lista.id ? null : lista.id)}
+                    onClick={() =>
+                      setListaAbierta(
+                        listaAbierta === lista.id ? null : lista.id,
+                      )
+                    }
                   >
                     <div className="text-left flex items-center gap-2">
                       <span
@@ -614,7 +660,10 @@ export function ListasPago({ tipo, state, actions }) {
                           <span className="flex items-center gap-1">
                             {item.nombre}
                             {lista.ciclo && (
-                              <CodeBadge code={lista.ciclo === "mensual" ? "M" : "Q"} size={13} />
+                              <CodeBadge
+                                code={lista.ciclo === "mensual" ? "M" : "Q"}
+                                size={13}
+                              />
                             )}
                           </span>
                           <span className="font-semibold">
@@ -630,7 +679,9 @@ export function ListasPago({ tipo, state, actions }) {
                             abrirPlanilla({
                               titulo: `Lista de pago ${lista.ciclo}`,
                               subtitulo: `${lista.periodo_inicio} – ${lista.periodo_fin}${
-                                lista.encargado ? ` · Reparte: ${lista.encargado}` : ""
+                                lista.encargado
+                                  ? ` · Reparte: ${lista.encargado}`
+                                  : ""
                               }`,
                               columnas: ["Nombre", "Importe", "Firma"],
                               filas: lista.items.map((item) => [

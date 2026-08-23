@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { Plus, Truck } from "lucide-react";
 import { NuevoVehiculoModal } from "../modals/NuevoVehiculoModal.jsx";
-import { Button, Card, IconBubble, SectionTitle } from "../../components/ui/primitives.jsx";
+import {
+  Button,
+  Card,
+  IconBubble,
+  SectionTitle,
+} from "../../components/ui/primitives.jsx";
 import { calcVehiculo } from "../../lib/calculos.js";
 import { colors } from "../../theme.js";
 
@@ -71,7 +76,8 @@ export function VehiculosTab({ state, actions, onVerFicha }) {
       <Card>
         <SectionTitle color="gold">Vehículos</SectionTitle>
         <p className="text-[11px] text-gray-500 mb-3">
-          Todas las furgonetas cobran quincenal — ya no existe un tipo de pago a elegir.
+          Todas las furgonetas cobran quincenal — ya no existe un tipo de pago a
+          elegir.
         </p>
         <Button
           variant="primary"
@@ -84,7 +90,9 @@ export function VehiculosTab({ state, actions, onVerFicha }) {
       <div className="space-y-2">
         {state.vehiculos.length === 0 ? (
           <Card>
-            <p className="text-gray-500 text-xs text-center py-6">No hay vehículos.</p>
+            <p className="text-gray-500 text-xs text-center py-6">
+              No hay vehículos.
+            </p>
           </Card>
         ) : (
           state.vehiculos.map((vehiculo) => (

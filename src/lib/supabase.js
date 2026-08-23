@@ -29,7 +29,8 @@ export function mensajeDeError(error) {
 
   // 42501 = permission denied. Casi siempre significa "este rol no puede",
   // no "algo está roto": vale la pena decirlo en ese idioma.
-  if (codigo === "42501" || codigo === "PGRST301") return "No tienes permiso para hacer eso.";
+  if (codigo === "42501" || codigo === "PGRST301")
+    return "No tienes permiso para hacer eso.";
   if (codigo === "23505") return "Ya existe un registro igual.";
   if (codigo === "23503") return "No se puede: hay datos que dependen de esto.";
   if (codigo === "23514") return "Algún dato no es válido.";

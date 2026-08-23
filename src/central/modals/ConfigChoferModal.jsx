@@ -34,7 +34,8 @@ export function ConfigChoferModal({ open, onClose, state, actions }) {
           Guardar
         </Button>
         <p className="text-[11px] text-gray-500 text-center">
-          Se copia a cada chofer del día al asignarlo — no afecta a los ya registrados.
+          Se copia a cada chofer del día al asignarlo — no afecta a los ya
+          registrados.
         </p>
       </div>
     </Sheet>

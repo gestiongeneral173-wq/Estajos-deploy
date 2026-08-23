@@ -4,7 +4,9 @@
  */
 export function descargarCSV(nombreArchivo, filas) {
   const csv = filas
-    .map((fila) => fila.map((celda) => `"${String(celda).replace(/"/g, '""')}"`).join(","))
+    .map((fila) =>
+      fila.map((celda) => `"${String(celda).replace(/"/g, '""')}"`).join(","),
+    )
     .join("\n");
 
   const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });

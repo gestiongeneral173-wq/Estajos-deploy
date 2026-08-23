@@ -5,7 +5,12 @@ import { ConfigChoferModal } from "../modals/ConfigChoferModal.jsx";
 import { GenerarPinesModal } from "../modals/GenerarPinesModal.jsx";
 import { NuevoTrabajadorModal } from "../modals/NuevoTrabajadorModal.jsx";
 import { TemporalesModal } from "../modals/TemporalesModal.jsx";
-import { Button, Card, Input, SectionTitle } from "../../components/ui/primitives.jsx";
+import {
+  Button,
+  Card,
+  Input,
+  SectionTitle,
+} from "../../components/ui/primitives.jsx";
 import { saldoEmpleado } from "../../lib/calculos.js";
 
 export const FILTROS_REGISTROS = [
@@ -45,7 +50,9 @@ export function RegistrosTab({ state, actions, onVerFicha }) {
               ? trabajador.es_encargado
               : trabajador.payment_period === filtro,
         )
-        .filter((m) => !d || `${m.nombre} ${m.apellido}`.toLowerCase().includes(d))
+        .filter(
+          (m) => !d || `${m.nombre} ${m.apellido}`.toLowerCase().includes(d),
+        )
         .map((m) => {
           // El PIN no se puede leer: sólo se muestran sus dos últimos
           // dígitos, que es lo que devuelve `pines_activos()`.
@@ -121,7 +128,9 @@ export function RegistrosTab({ state, actions, onVerFicha }) {
       <div className="space-y-2">
         {lista.length === 0 ? (
           <Card>
-            <p className="text-gray-500 text-xs text-center py-6">No hay registros.</p>
+            <p className="text-gray-500 text-xs text-center py-6">
+              No hay registros.
+            </p>
           </Card>
         ) : (
           lista.map((d) => (

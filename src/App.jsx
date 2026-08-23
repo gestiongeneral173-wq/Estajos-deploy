@@ -79,20 +79,27 @@ export function App() {
     return (
       <>
         <PinLogin onOpenCentral={() => setModalCentral(true)} />
-        {modalCentral && <LoginCentral onCancel={() => setModalCentral(false)} />}
+        {modalCentral && (
+          <LoginCentral onCancel={() => setModalCentral(false)} />
+        )}
       </>
     );
   }
 
   if (perfil.rol === "admin") return <CentralApp onSalir={salir} />;
-  if (perfil.rol === "encargado") return <AppCampo onSalir={salir} perfil={perfil} />;
+  if (perfil.rol === "encargado")
+    return <AppCampo onSalir={salir} perfil={perfil} />;
 
   return (
     <Pantalla>
       <p className="text-sm font-medium" style={{ color: colors.navyDark }}>
         Esta cuenta no tiene acceso.
       </p>
-      <button className="text-[13px] mt-3" style={{ color: colors.primary }} onClick={salir}>
+      <button
+        className="text-[13px] mt-3"
+        style={{ color: colors.primary }}
+        onClick={salir}
+      >
         Salir
       </button>
     </Pantalla>
@@ -100,8 +107,15 @@ export function App() {
 }
 
 function AppCampo({ onSalir, perfil }) {
-  const { vehiculos, personas, registros, cargando, error, enviarParte, completarJornada } =
-    useCampo();
+  const {
+    vehiculos,
+    personas,
+    registros,
+    cargando,
+    error,
+    enviarParte,
+    completarJornada,
+  } = useCampo();
   const [wizardAbierto, setWizardAbierto] = useState(false);
 
   if (cargando) {
@@ -120,7 +134,11 @@ function AppCampo({ onSalir, perfil }) {
         <p className="text-sm font-medium" style={{ color: colors.danger }}>
           {error}
         </p>
-        <button className="text-[13px] mt-3" style={{ color: colors.primary }} onClick={onSalir}>
+        <button
+          className="text-[13px] mt-3"
+          style={{ color: colors.primary }}
+          onClick={onSalir}
+        >
           Salir
         </button>
       </Pantalla>
@@ -150,7 +168,10 @@ function AppCampo({ onSalir, perfil }) {
       </div>
 
       {wizardAbierto && (
-        <div className="fixed inset-0 z-[60] flex flex-col" style={{ background: "transparent" }}>
+        <div
+          className="fixed inset-0 z-[60] flex flex-col"
+          style={{ background: "transparent" }}
+        >
           <div
             className="flex-1 flex flex-col mt-10 sm:mt-16 rounded-t-3xl overflow-hidden shadow-2xl mx-auto w-full sm:max-w-xl"
             style={{
@@ -159,7 +180,10 @@ function AppCampo({ onSalir, perfil }) {
               WebkitBackdropFilter: "blur(3px)",
             }}
           >
-            <AppHeader title="Nuevo registro" backTo={() => setWizardAbierto(false)} />
+            <AppHeader
+              title="Nuevo registro"
+              backTo={() => setWizardAbierto(false)}
+            />
             <NuevoRegistroWizard
               registrosCampo={registros}
               vehiculos={vehiculos}

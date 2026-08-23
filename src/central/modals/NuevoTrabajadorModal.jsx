@@ -39,8 +39,16 @@ export function NuevoTrabajadorModal({ open, onClose, actions }) {
     <Sheet open={open} title="Nuevo Trabajador" onClose={onClose}>
       <div className="space-y-3">
         <Input label="Nombre" value={form.nombre} onChange={campo("nombre")} />
-        <Input label="Apellido" value={form.apellido} onChange={campo("apellido")} />
-        <Input label="Número (teléfono)" value={form.telefono} onChange={campo("telefono")} />
+        <Input
+          label="Apellido"
+          value={form.apellido}
+          onChange={campo("apellido")}
+        />
+        <Input
+          label="Número (teléfono)"
+          value={form.telefono}
+          onChange={campo("telefono")}
+        />
         <div>
           <label className="eyebrow text-gray-600">Ciclo *</label>
           <select
@@ -69,7 +77,11 @@ export function NuevoTrabajadorModal({ open, onClose, actions }) {
         />
         <Button
           variant="primary"
-          disabled={!form.nombre || !form.apellido || !(parseFloat(form.tarifa_hora) > 0)}
+          disabled={
+            !form.nombre ||
+            !form.apellido ||
+            !(parseFloat(form.tarifa_hora) > 0)
+          }
           onClick={guardar}
         >
           Guardar

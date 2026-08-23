@@ -61,14 +61,23 @@ const COLUMNAS_TRABAJADOR = [
   "tarifa_hora",
   "es_encargado",
 ];
-const COLUMNAS_VEHICULO = ["nombre", "matricula", "plazas_totales", "tarifa_plaza", "propietario"];
+const COLUMNAS_VEHICULO = [
+  "nombre",
+  "matricula",
+  "plazas_totales",
+  "tarifa_plaza",
+  "propietario",
+];
 
 // `org_id` nunca se envía desde el cliente: lo pone el disparador
 // `fijar_org()` a partir de la sesión. Enviarlo sería, además, inútil.
 const soloColumnas = (obj, columnas) =>
-  Object.fromEntries(columnas.filter((c) => obj[c] !== undefined).map((c) => [c, obj[c]]));
+  Object.fromEntries(
+    columnas.filter((c) => obj[c] !== undefined).map((c) => [c, obj[c]]),
+  );
 
-const numero = (v) => (v === "" || v === null || v === undefined ? 0 : Number(v));
+const numero = (v) =>
+  v === "" || v === null || v === undefined ? 0 : Number(v);
 const ddmm = (f) => (f ? `${f.slice(8, 10)}/${f.slice(5, 7)}` : "");
 
 export function useEstajos() {
@@ -110,7 +119,9 @@ export function useEstajos() {
           .then(ok),
         supabase
           .from("vehiculos")
-          .select("id, nombre, matricula, plazas_totales, tarifa_plaza, propietario")
+          .select(
+            "id, nombre, matricula, plazas_totales, tarifa_plaza, propietario",
+          )
           .eq("activo", true)
           .order("nombre")
           .then(ok),
@@ -123,7 +134,9 @@ export function useEstajos() {
           .then(ok),
         supabase
           .from("adelantos")
-          .select("id, trabajador_id, vehiculo_id, fecha, monto, concepto, pago_id")
+          .select(
+            "id, trabajador_id, vehiculo_id, fecha, monto, concepto, pago_id",
+          )
           .order("fecha")
           .then(ok),
         supabase
@@ -135,7 +148,9 @@ export function useEstajos() {
           .then(ok),
         supabase
           .from("plazas_vehiculo")
-          .select("id, vehiculo_id, fecha, plazas, tarifa_aplicada, editada_manual, pago_id")
+          .select(
+            "id, vehiculo_id, fecha, plazas, tarifa_aplicada, editada_manual, pago_id",
+          )
           .order("fecha")
           .then(ok),
         supabase
@@ -154,11 +169,19 @@ export function useEstajos() {
           .order("creado_at", { ascending: false })
           .then(ok),
         supabase.rpc("pines_activos").then(ok),
-        supabase.from("ajustes").select("tarifa_chofer, tarifa_temporal").maybeSingle().then(ok),
+        supabase
+          .from("ajustes")
+          .select("tarifa_chofer, tarifa_temporal")
+          .maybeSingle()
+          .then(ok),
         supabase.rpc("periodos_activos").then(ok),
         // Los de baja sólo se piden para poder ponerles nombre donde salgan
         // como encargados de un parte viejo: sin esto quedaba un "—".
-        supabase.from("trabajadores").select("id, nombre, apellido").eq("activo", false).then(ok),
+        supabase
+          .from("trabajadores")
+          .select("id, nombre, apellido")
+          .eq("activo", false)
+          .then(ok),
       ]);
 
       // --- jornadas ------------------------------------------------------
@@ -282,8 +305,14 @@ export function useEstajos() {
 
       if (!montado.current) return;
       setState({
-        trabajadores: trabajadores.map((t) => ({ ...t, tarifa_hora: Number(t.tarifa_hora) })),
-        vehiculos: vehiculos.map((v) => ({ ...v, tarifa_plaza: Number(v.tarifa_plaza) })),
+        trabajadores: trabajadores.map((t) => ({
+          ...t,
+          tarifa_hora: Number(t.tarifa_hora),
+        })),
+        vehiculos: vehiculos.map((v) => ({
+          ...v,
+          tarifa_plaza: Number(v.tarifa_plaza),
+        })),
         jornadas: jornadasUi,
         adelantos: adelantosUi,
         pagos: pagosUi,
@@ -350,13 +379,17 @@ export function useEstajos() {
       }
     };
 
-    const rpc = (nombre, args) => mutar(() => supabase.rpc(nombre, args).then(ok));
+    const rpc = (nombre, args) =>
+      mutar(() => supabase.rpc(nombre, args).then(ok));
 
     return {
       // ---- Trabajadores --------------------------------------------------
       crearTrabajador: (datos) =>
         mutar(() =>
-          supabase.from("trabajadores").insert(soloColumnas(datos, COLUMNAS_TRABAJADOR)).then(ok),
+          supabase
+            .from("trabajadores")
+            .insert(soloColumnas(datos, COLUMNAS_TRABAJADOR))
+            .then(ok),
         ),
 
       actualizarTrabajador: (id, cambios) =>
@@ -376,13 +409,16 @@ export function useEstajos() {
         mutar(async () => {
           const generados = [];
           for (const id of empleadoIds) {
-            const pin = await supabase.rpc("generar_pin", { p_trabajador: id }).then(ok);
+            const pin = await supabase
+              .rpc("generar_pin", { p_trabajador: id })
+              .then(ok);
             generados.push({ empleado_id: id, pin });
           }
           return generados;
         }),
 
-      eliminarPinEncargado: (empleadoId) => rpc("revocar_pin", { p_trabajador: empleadoId }),
+      eliminarPinEncargado: (empleadoId) =>
+        rpc("revocar_pin", { p_trabajador: empleadoId }),
 
       // ---- Adelantos -------------------------------------------------------
       // La fecha decide en qué ciclo cae el descuento, así que se puede
@@ -392,7 +428,11 @@ export function useEstajos() {
         mutar(() =>
           supabase
             .from("adelantos")
-            .insert({ trabajador_id: empleadoId, monto: numero(monto), fecha: fecha || undefined })
+            .insert({
+              trabajador_id: empleadoId,
+              monto: numero(monto),
+              fecha: fecha || undefined,
+            })
             .then(ok),
         ),
 
@@ -432,7 +472,11 @@ export function useEstajos() {
       // ---- Liquidaciones -----------------------------------------------------
       pagarEmpleado: (id) => rpc("liquidar_trabajador", { p_trabajador: id }),
 
-      generarListaEmpleados: ({ encargado, empleadoIds, ciclo = "quincenal" }) =>
+      generarListaEmpleados: ({
+        encargado,
+        empleadoIds,
+        ciclo = "quincenal",
+      }) =>
         rpc("generar_lista", {
           p_tipo: "empleado",
           p_ciclo: ciclo,
@@ -452,7 +496,10 @@ export function useEstajos() {
       // ---- Vehículos -----------------------------------------------------------
       crearVehiculo: (datos) =>
         mutar(() =>
-          supabase.from("vehiculos").insert(soloColumnas(datos, COLUMNAS_VEHICULO)).then(ok),
+          supabase
+            .from("vehiculos")
+            .insert(soloColumnas(datos, COLUMNAS_VEHICULO))
+            .then(ok),
         ),
 
       actualizarVehiculo: (id, cambios) =>
@@ -495,7 +542,10 @@ export function useEstajos() {
         mutar(() => supabase.from("adelantos").delete().eq("id", id).then(ok)),
 
       editarPlazasDia: (id, plazas) =>
-        rpc("editar_plazas_dia", { p_id: id, p_plazas: Math.max(0, Math.trunc(numero(plazas))) }),
+        rpc("editar_plazas_dia", {
+          p_id: id,
+          p_plazas: Math.max(0, Math.trunc(numero(plazas))),
+        }),
 
       pagarVehiculo: (id) => rpc("liquidar_vehiculo", { p_vehiculo: id }),
 
@@ -523,7 +573,9 @@ export function useEstajos() {
         ),
 
       eliminarTodosLosTemporales: () =>
-        mutar(() => supabase.from("temporales").delete().not("id", "is", null).then(ok)),
+        mutar(() =>
+          supabase.from("temporales").delete().not("id", "is", null).then(ok),
+        ),
 
       // Se pasa por `set_tarifas` en vez de por un UPDATE directo: si la
       // organización aún no tiene fila en `ajustes`, el UPDATE no tocaba
@@ -540,7 +592,9 @@ export function useEstajos() {
         supabase.rpc("activar_panico", { p_password: password }).then(ok),
 
       cambiarPasswordPanico: (actual, nueva) =>
-        supabase.rpc("cambiar_password_panico", { p_actual: actual, p_nueva: nueva }).then(ok),
+        supabase
+          .rpc("cambiar_password_panico", { p_actual: actual, p_nueva: nueva })
+          .then(ok),
 
       cambiarPassword: async (password) => {
         const { error: e } = await supabase.auth.updateUser({ password });

@@ -1,12 +1,24 @@
 import { useEffect, useMemo, useState } from "react";
 import { Check, Pen, Trash2, X } from "lucide-react";
 import { CodeBadge } from "../../components/ui/Badges.jsx";
-import { Button, Card, Input, SectionTitle, Sheet } from "../../components/ui/primitives.jsx";
+import {
+  Button,
+  Card,
+  Input,
+  SectionTitle,
+  Sheet,
+} from "../../components/ui/primitives.jsx";
 import { hoy } from "../../lib/format.js";
 import { colors } from "../../theme.js";
 
 export function ReporteDiarioTab({ state, actions }) {
-  const { jornadas, trabajadores, vehiculos, temporales, trabajadoresBaja = [] } = state,
+  const {
+      jornadas,
+      trabajadores,
+      vehiculos,
+      temporales,
+      trabajadoresBaja = [],
+    } = state,
     [fecha, setFecha] = useState(hoy()),
     [editando, setEditando] = useState(null),
     [borrador, setBorrador] = useState({
@@ -88,7 +100,9 @@ export function ReporteDiarioTab({ state, actions }) {
         U[T].empleados.push($);
       });
       // Registro Central siempre el primero.
-      return Object.values(U).sort((a, b) => Number(b.esCentral) - Number(a.esCentral));
+      return Object.values(U).sort(
+        (a, b) => Number(b.esCentral) - Number(a.esCentral),
+      );
     }, [jornadas, fecha, trabajadores, vehiculos, trabajadoresBaja]),
     guardarEdicion = (D) => {
       actions.editarJornada(D, {
@@ -103,7 +117,11 @@ export function ReporteDiarioTab({ state, actions }) {
         grupoActivo
           ? grupoActivo.empleados
               .filter((empleado) => seleccion.has(empleado.id))
-              .map((D) => trabajadores.find((trabajador) => trabajador.id === D.empleado_id))
+              .map((D) =>
+                trabajadores.find(
+                  (trabajador) => trabajador.id === D.empleado_id,
+                ),
+              )
               .map((D) => (D ? `${D.nombre} ${D.apellido}` : "—"))
           : [],
       [grupoActivo, seleccion, trabajadores],
@@ -118,20 +136,30 @@ export function ReporteDiarioTab({ state, actions }) {
     <div className="px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-6 max-w-md sm:max-w-2xl lg:max-w-4xl mx-auto space-y-4 lg:space-y-5">
       <Card>
         <SectionTitle color="gold">Reporte Diario</SectionTitle>
-        <Input label="Fecha" type="date" value={fecha} onChange={(D) => setFecha(D.target.value)} />
+        <Input
+          label="Fecha"
+          type="date"
+          value={fecha}
+          onChange={(D) => setFecha(D.target.value)}
+        />
       </Card>
       <div className="space-y-3">
         {grupos.length === 0 ? (
           <Card>
             <SectionTitle color="green">Jornadas registradas</SectionTitle>
-            <p className="text-gray-500 text-xs text-center py-8">Sin datos para esta fecha.</p>
+            <p className="text-gray-500 text-xs text-center py-8">
+              Sin datos para esta fecha.
+            </p>
           </Card>
         ) : (
           grupos.map((grupo) => {
             var $, T;
             const U = grupoAbierto === grupo.key;
             return (
-              <div className="bg-white rounded-xl shadow-sm overflow-hidden" key={grupo.key}>
+              <div
+                className="bg-white rounded-xl shadow-sm overflow-hidden"
+                key={grupo.key}
+              >
                 <div
                   className="px-5 pt-4 pb-3 flex items-start justify-between gap-2 border-b"
                   style={{
@@ -145,7 +173,8 @@ export function ReporteDiarioTab({ state, actions }) {
                         color: colors.navyDark,
                       }}
                     >
-                      {((T = grupo.vehiculo) == null ? undefined : T.nombre) ?? "—"}
+                      {((T = grupo.vehiculo) == null ? undefined : T.nombre) ??
+                        "—"}
                     </p>
                     <p
                       className="text-[11px] mt-1 flex items-center gap-1.5"
@@ -154,13 +183,20 @@ export function ReporteDiarioTab({ state, actions }) {
                       }}
                     >
                       {"Encargado: "}
-                      {(($ = grupo.encargado) == null ? undefined : $.nombre) ?? "—"}
+                      {(($ = grupo.encargado) == null ? undefined : $.nombre) ??
+                        "—"}
                       {grupo.encargado && grupo.encargado.de_baja && (
-                        <span style={{ color: colors.danger }}>· dado de baja</span>
+                        <span style={{ color: colors.danger }}>
+                          · dado de baja
+                        </span>
                       )}
                       {grupo.encargado && grupo.encargado.payment_period && (
                         <CodeBadge
-                          code={grupo.encargado.payment_period === "mensual" ? "M" : "Q"}
+                          code={
+                            grupo.encargado.payment_period === "mensual"
+                              ? "M"
+                              : "Q"
+                          }
                           size={13}
                         />
                       )}
@@ -173,7 +209,11 @@ export function ReporteDiarioTab({ state, actions }) {
                       color: U ? colors.danger : colors.muted,
                     }}
                   >
-                    {U ? <X className="w-4 h-4" /> : <Trash2 className="w-4 h-4" />}
+                    {U ? (
+                      <X className="w-4 h-4" />
+                    ) : (
+                      <Trash2 className="w-4 h-4" />
+                    )}
                   </button>
                 </div>
                 <div className="px-5 pt-3 pb-1 space-y-2">
@@ -186,7 +226,9 @@ export function ReporteDiarioTab({ state, actions }) {
                   >
                     <span>Persona</span>
                     <span className="text-right">Horas</span>
-                    <span className="text-right border-l border-gray-300 pl-2">Destajo</span>
+                    <span className="text-right border-l border-gray-300 pl-2">
+                      Destajo
+                    </span>
                     <span />
                   </div>
                   {grupo.empleados.map((XVar) => {
@@ -215,14 +257,18 @@ export function ReporteDiarioTab({ state, actions }) {
                             <span
                               className="truncate flex items-center gap-1"
                               style={{
-                                color: XVar.fue_liquidado ? "#9DA19C" : colors.navyDark,
+                                color: XVar.fue_liquidado
+                                  ? "#9DA19C"
+                                  : colors.navyDark,
                               }}
                             >
                               {we == null ? undefined : we.nombre}{" "}
                               {we == null ? undefined : we.apellido}
                               {we && (
                                 <CodeBadge
-                                  code={we.payment_period === "mensual" ? "M" : "Q"}
+                                  code={
+                                    we.payment_period === "mensual" ? "M" : "Q"
+                                  }
                                   size={14}
                                 />
                               )}
@@ -345,7 +391,8 @@ export function ReporteDiarioTab({ state, actions }) {
                 {grupo.vehiculo &&
                   temporales.filter(
                     (temporal) =>
-                      temporal.fecha === fecha && temporal.vehiculo_id === grupo.vehiculo.id,
+                      temporal.fecha === fecha &&
+                      temporal.vehiculo_id === grupo.vehiculo.id,
                   ).length > 0 && (
                     <div
                       className="px-5 pb-3 pt-2 space-y-1.5 border-t"
@@ -364,7 +411,8 @@ export function ReporteDiarioTab({ state, actions }) {
                       {temporales
                         .filter(
                           (temporal) =>
-                            temporal.fecha === fecha && temporal.vehiculo_id === grupo.vehiculo.id,
+                            temporal.fecha === fecha &&
+                            temporal.vehiculo_id === grupo.vehiculo.id,
                         )
                         .map((z) => (
                           <div
@@ -429,9 +477,14 @@ export function ReporteDiarioTab({ state, actions }) {
               <li key={U}>{nombresSeleccionado}</li>
             ))}
           </ul>
-          <p className="text-xs text-gray-600">Esta acción no se puede deshacer.</p>
+          <p className="text-xs text-gray-600">
+            Esta acción no se puede deshacer.
+          </p>
           <div className="grid grid-cols-2 gap-3">
-            <Button variant="outline" onClick={() => setConfirmarBorrado(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setConfirmarBorrado(false)}
+            >
               Cancelar
             </Button>
             <Button variant="danger" onClick={eliminarSeleccionados}>

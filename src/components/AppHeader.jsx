@@ -1,7 +1,13 @@
 import { ArrowLeft, LogOut } from "lucide-react";
 import { colors } from "../theme.js";
 
-export function AppHeader({ title = "ESTAJOS", subtitle, onLogout, backTo, right }) {
+export function AppHeader({
+  title = "ESTAJOS",
+  subtitle,
+  onLogout,
+  backTo,
+  right,
+}) {
   return (
     <header
       className="px-3 sm:px-6 lg:px-8 sticky top-0 z-30 bg-white border-b"

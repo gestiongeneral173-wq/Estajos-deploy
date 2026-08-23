@@ -87,17 +87,23 @@ export function TemporalesModal({ open, onClose, state, actions }) {
       </div>
       <div className="bg-gray-50 rounded-xl p-3">
         <p className="text-[11px] text-gray-500 mb-3">
-          El listado es informativo — el encargado anota horas y destajo, el sistema no calcula
-          ningún pago. Los de días anteriores se borran solos cada noche; los de hoy siguen aquí
-          hasta que pase el día o los elimines.
+          El listado es informativo — el encargado anota horas y destajo, el
+          sistema no calcula ningún pago. Los de días anteriores se borran solos
+          cada noche; los de hoy siguen aquí hasta que pase el día o los
+          elimines.
         </p>
         {temporales.length === 0 ? (
-          <p className="text-gray-500 text-xs text-center py-3">Sin temporales registrados hoy.</p>
+          <p className="text-gray-500 text-xs text-center py-3">
+            Sin temporales registrados hoy.
+          </p>
         ) : (
           <div className="space-y-1">
             <div className="grid grid-cols-5 gap-1 pb-2 border-b border-gray-100">
               {["Nombre", "Horas", "Destajo", "Tarifa", ""].map((k, N) => (
-                <p className="eyebrow text-gray-500 text-center first:text-left" key={N}>
+                <p
+                  className="eyebrow text-gray-500 text-center first:text-left"
+                  key={N}
+                >
                   {k}
                 </p>
               ))}
@@ -174,7 +180,11 @@ export function TemporalesModal({ open, onClose, state, actions }) {
           </div>
         )}
         {temporales.length > 0 && (
-          <Button variant="danger" className="mt-3" onClick={actions.eliminarTodosLosTemporales}>
+          <Button
+            variant="danger"
+            className="mt-3"
+            onClick={actions.eliminarTodosLosTemporales}
+          >
             Eliminar todos
           </Button>
         )}

@@ -6,7 +6,12 @@ import { Button, Input, Sheet } from "../../components/ui/primitives.jsx";
 import { colors, hexToRgba } from "../../theme.js";
 
 const fechaCorta = (iso) =>
-  iso ? new Date(iso).toLocaleDateString("es-ES", { day: "numeric", month: "short" }) : "—";
+  iso
+    ? new Date(iso).toLocaleDateString("es-ES", {
+        day: "numeric",
+        month: "short",
+      })
+    : "—";
 
 /**
  * Dar un PIN es lo que convierte a alguien en encargado, así que se elige
@@ -27,7 +32,8 @@ export function GenerarPinesModal({ open, onClose, state, actions }) {
   const filtrados = useMemo(() => {
     const texto = q.trim().toLowerCase();
     return trabajadores.filter(
-      (t) => !texto || `${t.nombre} ${t.apellido}`.toLowerCase().includes(texto),
+      (t) =>
+        !texto || `${t.nombre} ${t.apellido}`.toLowerCase().includes(texto),
     );
   }, [trabajadores, q]);
 
@@ -87,7 +93,8 @@ export function GenerarPinesModal({ open, onClose, state, actions }) {
           >
             <p className="eyebrow text-gray-600">PIN generado</p>
             <p className="text-[11px] text-gray-600 -mt-1">
-              Apúntalo ahora: no se puede volver a ver. Si se pierde, se genera otro.
+              Apúntalo ahora: no se puede volver a ver. Si se pierde, se genera
+              otro.
             </p>
 
             {generados.map(({ empleado_id, pin }) => {
@@ -104,7 +111,10 @@ export function GenerarPinesModal({ open, onClose, state, actions }) {
                     >
                       {nombreDe(empleado_id)}
                       {t && (
-                        <CodeBadge code={t.payment_period === "mensual" ? "M" : "Q"} size={14} />
+                        <CodeBadge
+                          code={t.payment_period === "mensual" ? "M" : "Q"}
+                          size={14}
+                        />
                       )}
                     </p>
                     <p
@@ -159,7 +169,9 @@ export function GenerarPinesModal({ open, onClose, state, actions }) {
             ) : (
               <div className="border border-gray-200 rounded-xl overflow-hidden max-h-56 overflow-y-auto">
                 {filtrados.map((t, i) => {
-                  const yaTiene = pinesEncargado.some((p) => p.empleado_id === t.id);
+                  const yaTiene = pinesEncargado.some(
+                    (p) => p.empleado_id === t.id,
+                  );
                   return (
                     <label
                       className="grid grid-cols-[auto_1fr_auto] gap-2 p-2 border-t border-gray-100 first:border-t-0 items-center text-xs"
@@ -182,10 +194,16 @@ export function GenerarPinesModal({ open, onClose, state, actions }) {
                         style={{ color: colors.navyDark }}
                       >
                         {t.nombre} {t.apellido}
-                        <CodeBadge code={t.payment_period === "mensual" ? "M" : "Q"} size={14} />
+                        <CodeBadge
+                          code={t.payment_period === "mensual" ? "M" : "Q"}
+                          size={14}
+                        />
                       </span>
                       {yaTiene && (
-                        <span className="text-[11px] font-semibold" style={{ color: "#3C403E" }}>
+                        <span
+                          className="text-[11px] font-semibold"
+                          style={{ color: "#3C403E" }}
+                        >
                           ya tiene PIN
                         </span>
                       )}
@@ -212,7 +230,9 @@ export function GenerarPinesModal({ open, onClose, state, actions }) {
         <div className="bg-gray-50 rounded-xl p-3">
           <p className="eyebrow text-gray-500 mb-2">PINs activos</p>
           {pinesEncargado.length === 0 ? (
-            <p className="text-gray-500 text-xs text-center py-3">No hay PINs activos.</p>
+            <p className="text-gray-500 text-xs text-center py-3">
+              No hay PINs activos.
+            </p>
           ) : (
             <div className="space-y-1">
               {pinesEncargado.map((p) => {
@@ -228,7 +248,10 @@ export function GenerarPinesModal({ open, onClose, state, actions }) {
                     >
                       {p.nombre ?? nombreDe(p.empleado_id)}
                       {t && (
-                        <CodeBadge code={t.payment_period === "mensual" ? "M" : "Q"} size={14} />
+                        <CodeBadge
+                          code={t.payment_period === "mensual" ? "M" : "Q"}
+                          size={14}
+                        />
                       )}
                     </p>
                     {/* Sólo los dos últimos dígitos: sirven para reconocer
@@ -241,11 +264,16 @@ export function GenerarPinesModal({ open, onClose, state, actions }) {
                       ••{p.ultimos}
                     </p>
                     <div className="flex items-center gap-2">
-                      <span className="text-[10px]" style={{ color: colors.muted }}>
+                      <span
+                        className="text-[10px]"
+                        style={{ color: colors.muted }}
+                      >
                         cad. {fechaCorta(p.expira_at)}
                       </span>
                       <button
-                        onClick={() => actions.eliminarPinEncargado(p.empleado_id)}
+                        onClick={() =>
+                          actions.eliminarPinEncargado(p.empleado_id)
+                        }
                         aria-label={`Revocar el PIN de ${p.nombre ?? nombreDe(p.empleado_id)}`}
                         className="text-gray-500 hover:text-red-500"
                       >

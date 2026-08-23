@@ -1,9 +1,18 @@
 import { eur } from "./format.js";
 
 const esc = (t) =>
-  String(t ?? "").replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
+  String(t ?? "").replace(
+    /[&<>]/g,
+    (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c],
+  );
 
-const documento = ({ titulo, subtitulo, columnas, filas, total }) => `<!doctype html>
+const documento = ({
+  titulo,
+  subtitulo,
+  columnas,
+  filas,
+  total,
+}) => `<!doctype html>
 <html lang="es"><head><meta charset="utf-8"><title>${esc(titulo)}</title>
 <style>
   @page { size: A4; margin: 14mm; }
@@ -24,7 +33,10 @@ const documento = ({ titulo, subtitulo, columnas, filas, total }) => `<!doctype 
 <p class="sub">${esc(subtitulo)}</p>
 <table>
   <thead><tr>${columnas
-    .map((c, i) => `<th class="${i && i < columnas.length - 1 ? "num" : ""}">${esc(c)}</th>`)
+    .map(
+      (c, i) =>
+        `<th class="${i && i < columnas.length - 1 ? "num" : ""}">${esc(c)}</th>`,
+    )
     .join("")}</tr></thead>
   <tbody>${filas
     .map(
@@ -55,7 +67,13 @@ const documento = ({ titulo, subtitulo, columnas, filas, total }) => `<!doctype 
  * del móvil directamente no hacía nada. El documento se construye aquí y se
  * imprime solo; si el navegador bloquea la ventana emergente, se descarga.
  */
-export function abrirPlanilla({ titulo, subtitulo = "", columnas, filas, total = 0 }) {
+export function abrirPlanilla({
+  titulo,
+  subtitulo = "",
+  columnas,
+  filas,
+  total = 0,
+}) {
   const html = documento({ titulo, subtitulo, columnas, filas, total });
   const ventana = window.open("", "_blank");
 
@@ -69,7 +87,9 @@ export function abrirPlanilla({ titulo, subtitulo = "", columnas, filas, total =
 
   // ponytail: sin ventana emergente se descarga el fichero y lo abre quien
   // quiera. Es el mismo documento, sólo cambia por dónde sale.
-  const url = URL.createObjectURL(new Blob([html], { type: "text/html;charset=utf-8" }));
+  const url = URL.createObjectURL(
+    new Blob([html], { type: "text/html;charset=utf-8" }),
+  );
   const enlace = document.createElement("a");
   enlace.href = url;
   enlace.download = `${titulo.replace(/[^\w\s-]/g, "").trim()}.html`;

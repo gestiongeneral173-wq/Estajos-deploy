@@ -54,11 +54,16 @@ export function useCampo() {
       for (const parte of partes) {
         const horasRoles = {};
         for (const j of parte.jornadas ?? []) {
-          horasRoles[j.trabajador_id] = { horas: Number(j.horas), destajo: Number(j.destajo) };
+          horasRoles[j.trabajador_id] = {
+            horas: Number(j.horas),
+            destajo: Number(j.destajo),
+          };
         }
         const pasajeros = (parte.jornadas ?? [])
           .filter(
-            (j) => j.trabajador_id !== parte.encargado_id && j.trabajador_id !== parte.chofer_id,
+            (j) =>
+              j.trabajador_id !== parte.encargado_id &&
+              j.trabajador_id !== parte.chofer_id,
           )
           .map((j) => ({
             id: j.trabajador_id,
@@ -78,7 +83,13 @@ export function useCampo() {
         };
       }
 
-      setVehiculos(veh.map((v) => ({ id: v.id, nombre: v.nombre, plazas: v.plazas_totales })));
+      setVehiculos(
+        veh.map((v) => ({
+          id: v.id,
+          nombre: v.nombre,
+          plazas: v.plazas_totales,
+        })),
+      );
       setPersonas(
         trab.map((t) => ({
           id: t.id,
@@ -106,15 +117,17 @@ export function useCampo() {
    */
   const enviarParte = useCallback(
     async (fecha, vehiculoId, parte) => {
-      const lineas = Object.entries(parte.horasRoles ?? {}).map(([trabajadorId, v]) => ({
-        trabajador_id: trabajadorId,
-        rol: trabajadorId === parte.chofer ? "chofer" : "pasajero",
-        // El encargado a bordo se marca a mano y es opcional: viaja con la
-        // persona, no en la cabecera, para no cambiar la firma de la función.
-        es_encargado: trabajadorId === parte.encargado,
-        horas: Number(v.horas) || 0,
-        destajo: Number(v.destajo) || 0,
-      }));
+      const lineas = Object.entries(parte.horasRoles ?? {}).map(
+        ([trabajadorId, v]) => ({
+          trabajador_id: trabajadorId,
+          rol: trabajadorId === parte.chofer ? "chofer" : "pasajero",
+          // El encargado a bordo se marca a mano y es opcional: viaja con la
+          // persona, no en la cabecera, para no cambiar la firma de la función.
+          es_encargado: trabajadorId === parte.encargado,
+          horas: Number(v.horas) || 0,
+          destajo: Number(v.destajo) || 0,
+        }),
+      );
 
       await supabase
         .rpc("enviar_parte", {
@@ -171,6 +184,15 @@ export function useCampo() {
       completarJornada,
       recargar,
     }),
-    [vehiculos, personas, registros, cargando, error, enviarParte, completarJornada, recargar],
+    [
+      vehiculos,
+      personas,
+      registros,
+      cargando,
+      error,
+      enviarParte,
+      completarJornada,
+      recargar,
+    ],
   );
 }

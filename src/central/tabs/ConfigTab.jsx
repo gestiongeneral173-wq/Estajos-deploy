@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { Check, KeyRound, ShieldAlert } from "lucide-react";
-import { Button, Card, Input, SectionTitle } from "../../components/ui/primitives.jsx";
+import {
+  Button,
+  Card,
+  Input,
+  SectionTitle,
+} from "../../components/ui/primitives.jsx";
 import { marcarCorte } from "../../lib/panico.js";
 import { colors, hexToRgba } from "../../theme.js";
 
@@ -16,7 +21,8 @@ export function ConfigTab({ actions }) {
   const guardar = async (e) => {
     e.preventDefault();
     setError(null);
-    if (pass.length < 6) return setError("La contraseña debe tener al menos 6 caracteres.");
+    if (pass.length < 6)
+      return setError("La contraseña debe tener al menos 6 caracteres.");
     if (pass !== pass2) return setError("Las contraseñas no coinciden.");
 
     setGuardando(true);
@@ -144,7 +150,8 @@ function PanicoCard({ actions }) {
   const cambiar = async (e) => {
     e.preventDefault();
     setError(null);
-    if (nueva.length < 8) return setError("La nueva contraseña necesita al menos 8 caracteres.");
+    if (nueva.length < 8)
+      return setError("La nueva contraseña necesita al menos 8 caracteres.");
     setOcupado(true);
     try {
       await actions.cambiarPasswordPanico(actual, nueva);
@@ -175,15 +182,21 @@ function PanicoCard({ actions }) {
       </div>
 
       <p className="text-[12px] mb-3" style={{ color: colors.muted }}>
-        Desconecta la aplicación de la base de datos al instante, para todo el mundo. Úsalo si crees
-        que alguien está accediendo a los datos sin permiso.{" "}
-        <strong style={{ color: colors.danger }}>No se puede deshacer desde aquí</strong>: para
-        volver a abrir hay que ejecutar los permisos a mano en Supabase.
+        Desconecta la aplicación de la base de datos al instante, para todo el
+        mundo. Úsalo si crees que alguien está accediendo a los datos sin
+        permiso.{" "}
+        <strong style={{ color: colors.danger }}>
+          No se puede deshacer desde aquí
+        </strong>
+        : para volver a abrir hay que ejecutar los permisos a mano en Supabase.
       </p>
 
       {error && (
         <div className="p-3 mb-3 border border-red-200 bg-red-50 rounded-xl">
-          <p className="text-xs font-medium text-center" style={{ color: colors.danger }}>
+          <p
+            className="text-xs font-medium text-center"
+            style={{ color: colors.danger }}
+          >
             {error}
           </p>
         </div>
@@ -191,7 +204,10 @@ function PanicoCard({ actions }) {
       {ok && (
         <div className="flex items-center justify-center gap-2 p-3 mb-3 border border-green-200 bg-green-50 rounded-xl">
           <Check className="w-4 h-4" style={{ color: colors.primary }} />
-          <p className="text-xs font-semibold" style={{ color: colors.primary }}>
+          <p
+            className="text-xs font-semibold"
+            style={{ color: colors.primary }}
+          >
             Contraseña de emergencia actualizada
           </p>
         </div>
@@ -229,7 +245,11 @@ function PanicoCard({ actions }) {
             >
               Cancelar
             </Button>
-            <Button variant="danger" type="submit" disabled={!password || ocupado}>
+            <Button
+              variant="danger"
+              type="submit"
+              disabled={!password || ocupado}
+            >
               {ocupado ? "Cortando…" : "Cortar ahora"}
             </Button>
           </div>

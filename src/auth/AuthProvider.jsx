@@ -1,4 +1,10 @@
-import { createContext, useCallback, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
 import { ok, supabase } from "../lib/supabase.js";
 
@@ -20,7 +26,9 @@ export function AuthProvider({ children }) {
     if (!userId) return null;
     const { data, error } = await supabase
       .from("perfiles")
-      .select("user_id, org_id, rol, trabajador_id, activo, organizaciones(nombre)")
+      .select(
+        "user_id, org_id, rol, trabajador_id, activo, organizaciones(nombre)",
+      )
       .eq("user_id", userId)
       .maybeSingle();
 
@@ -42,13 +50,15 @@ export function AuthProvider({ children }) {
       setCargando(false);
     });
 
-    const { data: sub } = supabase.auth.onAuthStateChange(async (_evento, s) => {
-      const p = s ? await cargarPerfil(s.user.id) : null;
-      if (!vivo) return;
-      setSesion(s ?? null);
-      setPerfil(p);
-      setCargando(false);
-    });
+    const { data: sub } = supabase.auth.onAuthStateChange(
+      async (_evento, s) => {
+        const p = s ? await cargarPerfil(s.user.id) : null;
+        if (!vivo) return;
+        setSesion(s ?? null);
+        setPerfil(p);
+        setCargando(false);
+      },
+    );
 
     return () => {
       vivo = false;
@@ -85,7 +95,9 @@ export function AuthProvider({ children }) {
    */
   const entrarConPin = useCallback(
     async (pin) => {
-      const { data, error } = await supabase.functions.invoke("campo-login", { body: { pin } });
+      const { data, error } = await supabase.functions.invoke("campo-login", {
+        body: { pin },
+      });
       if (error) {
         // `invoke` esconde el cuerpo del error en `context`.
         let mensaje = "No se pudo entrar.";
@@ -127,7 +139,9 @@ export function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ sesion, perfil, cargando, entrarCentral, entrarConPin, salir }}>
+    <AuthContext.Provider
+      value={{ sesion, perfil, cargando, entrarCentral, entrarConPin, salir }}
+    >
       {children}
     </AuthContext.Provider>
   );

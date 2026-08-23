@@ -3,7 +3,14 @@ import { CodeBadge } from "../components/ui/Badges.jsx";
 import { colors } from "../theme.js";
 
 export function WorkerRow({ worker, onClick, modoEncargados = false }) {
-  const { nombre, telefono, paymentPeriod, balance = 0, es_encargado: esEncargado, pin } = worker,
+  const {
+      nombre,
+      telefono,
+      paymentPeriod,
+      balance = 0,
+      es_encargado: esEncargado,
+      pin,
+    } = worker,
     tieneSaldo = Number(balance) > 0;
   return (
     <button

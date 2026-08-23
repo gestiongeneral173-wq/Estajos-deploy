@@ -61,7 +61,11 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
           >
             Vehículo no encontrado.
           </p>
-          <Button variant="outline" icon={<ArrowLeft className="w-4 h-4" />} onClick={onBack}>
+          <Button
+            variant="outline"
+            icon={<ArrowLeft className="w-4 h-4" />}
+            onClick={onBack}
+          >
             Volver a vehículos
           </Button>
         </Card>
@@ -74,7 +78,10 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
     <div className="px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6 lg:pt-8 pb-6 max-w-md sm:max-w-2xl lg:max-w-4xl mx-auto space-y-4 lg:space-y-5">
       <Card>
         <div className="flex items-center gap-2 mb-4">
-          <button onClick={onBack} className="text-gray-600 hover:text-gray-700">
+          <button
+            onClick={onBack}
+            className="text-gray-600 hover:text-gray-700"
+          >
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div className="flex-1">
@@ -86,7 +93,9 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
             >
               {vehiculo.nombre}
             </h1>
-            <p className="text-gray-600 text-[11px]">{vehiculo.matricula ?? "—"}</p>
+            <p className="text-gray-600 text-[11px]">
+              {vehiculo.matricula ?? "—"}
+            </p>
           </div>
           <button
             onClick={() => {
@@ -117,7 +126,11 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
               onClick={() => setTarifaOculta((Yz) => !Yz)}
               className="absolute top-0 right-3 p-1.5 text-gray-400 hover:text-gray-600 active:scale-90"
             >
-              {tarifaOculta ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+              {tarifaOculta ? (
+                <EyeOff className="w-3.5 h-3.5" />
+              ) : (
+                <Eye className="w-3.5 h-3.5" />
+              )}
             </button>
           </div>
           <div className="bg-gray-50 rounded-xl p-3 text-center">
@@ -137,7 +150,8 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
         <Card>
           <SectionTitle color="gold">Editar datos</SectionTitle>
           <p className="text-[11px] text-gray-500 mb-3 -mt-2">
-            Los cambios aplican a futuras jornadas; el histórico ya registrado no se altera.
+            Los cambios aplican a futuras jornadas; el histórico ya registrado
+            no se altera.
           </p>
           <div className="space-y-3">
             <Input
@@ -261,7 +275,10 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
                   <div className="flex items-center justify-end gap-1">
                     <button
                       onClick={() => {
-                        actions.editarPlazasDia(dia.id, parseInt(valorPlazas, 10) || 0);
+                        actions.editarPlazasDia(
+                          dia.id,
+                          parseInt(valorPlazas, 10) || 0,
+                        );
                         setPlazasEditando(null);
                       }}
                       style={{
@@ -270,7 +287,10 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
                     >
                       <Check className="w-3.5 h-3.5" />
                     </button>
-                    <button onClick={() => setPlazasEditando(null)} className="text-gray-500">
+                    <button
+                      onClick={() => setPlazasEditando(null)}
+                      className="text-gray-500"
+                    >
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -295,7 +315,9 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
               }}
             >
               <span className="col-span-2 text-right">SUBTOTAL:</span>
-              <span className="text-right">€{calc.totalDevengado.toFixed(2)}</span>
+              <span className="text-right">
+                €{calc.totalDevengado.toFixed(2)}
+              </span>
               <span />
             </div>
           </div>
@@ -368,7 +390,9 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
           </Button>
         </div>
         {calc.adelantos.length === 0 ? (
-          <p className="text-gray-500 text-xs text-center py-4">Sin adelantos.</p>
+          <p className="text-gray-500 text-xs text-center py-4">
+            Sin adelantos.
+          </p>
         ) : (
           <div className="space-y-2">
             {calc.adelantos.map((adelanto) => (
@@ -379,14 +403,18 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
                 <p className="text-xs text-gray-600 truncate flex-1 pr-2">
                   {adelanto.concepto || "Adelanto"}
                 </p>
-                {(accionAdelanto == null ? undefined : accionAdelanto.id) === adelanto.id &&
-                (accionAdelanto == null ? undefined : accionAdelanto.tipo) === "editando" ? (
+                {(accionAdelanto == null ? undefined : accionAdelanto.id) ===
+                  adelanto.id &&
+                (accionAdelanto == null ? undefined : accionAdelanto.tipo) ===
+                  "editando" ? (
                   <div className="flex items-center gap-1">
                     <input
                       type="number"
                       autoFocus={true}
                       defaultValue={adelanto.monto}
-                      onChange={(F) => (accionAdelanto.monto = parseFloat(F.target.value) || 0)}
+                      onChange={(F) =>
+                        (accionAdelanto.monto = parseFloat(F.target.value) || 0)
+                      }
                       className="w-16 px-1 py-0.5 bg-gray-50 border border-gray-200 rounded text-xs text-right"
                     />
                     <button
@@ -403,7 +431,10 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
                     >
                       <Check className="w-3.5 h-3.5" />
                     </button>
-                    <button onClick={() => setAccionAdelanto(null)} className="text-gray-500">
+                    <button
+                      onClick={() => setAccionAdelanto(null)}
+                      className="text-gray-500"
+                    >
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -452,7 +483,9 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
         defaultOpen={pagosDelVehiculo.length > 0}
       >
         {pagosDelVehiculo.length === 0 ? (
-          <p className="text-gray-500 text-xs text-center py-4">Sin pagos liquidados todavía.</p>
+          <p className="text-gray-500 text-xs text-center py-4">
+            Sin pagos liquidados todavía.
+          </p>
         ) : (
           <div className="border border-gray-200 rounded-xl overflow-hidden">
             <div className="grid grid-cols-4 gap-1 bg-gray-50 p-2 eyebrow text-gray-600">
@@ -465,7 +498,9 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
               <div className="border-t border-gray-100" key={j.id}>
                 <button
                   type="button"
-                  onClick={() => setPagoAbierto((Ys) => (Ys === j.id ? null : j.id))}
+                  onClick={() =>
+                    setPagoAbierto((Ys) => (Ys === j.id ? null : j.id))
+                  }
                   className="w-full grid grid-cols-4 gap-1 p-2 text-[11px] items-center text-left"
                   style={{
                     color: colors.navyDark,
@@ -481,7 +516,9 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
                     {" – "}
                     {j.periodo_fin}
                   </span>
-                  <span className="text-right">€{Number(j.total_devengado).toFixed(2)}</span>
+                  <span className="text-right">
+                    €{Number(j.total_devengado).toFixed(2)}
+                  </span>
                   <span
                     className="text-right"
                     style={{
@@ -541,7 +578,8 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
       <Card>
         <SectionTitle color="gold">Dar de baja</SectionTitle>
         <p className="text-gray-500 text-[11px] mb-3">
-          Calcula lo que se le debe, liquida ese monto y retira la furgoneta de forma permanente.
+          Calcula lo que se le debe, liquida ese monto y retira la furgoneta de
+          forma permanente.
         </p>
         <Button
           variant="danger"
@@ -603,10 +641,12 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
       <Sheet
         open={
           !!accionAdelanto &&
-          (accionAdelanto.tipo === "editar" || accionAdelanto.tipo === "eliminar")
+          (accionAdelanto.tipo === "editar" ||
+            accionAdelanto.tipo === "eliminar")
         }
         title={
-          (accionAdelanto == null ? undefined : accionAdelanto.tipo) === "editar"
+          (accionAdelanto == null ? undefined : accionAdelanto.tipo) ===
+          "editar"
             ? "Confirmar edición"
             : "Confirmar eliminación"
         }
@@ -614,7 +654,8 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
       >
         <div className="space-y-4">
           <p className="text-gray-600 text-sm">
-            {(accionAdelanto == null ? undefined : accionAdelanto.tipo) === "editar"
+            {(accionAdelanto == null ? undefined : accionAdelanto.tipo) ===
+            "editar"
               ? `¿Actualizar el monto a €${Number((accionAdelanto == null ? undefined : accionAdelanto.monto) ?? 0).toFixed(2)}?`
               : "¿Eliminar este adelanto? Esta acción no se puede deshacer."}
           </p>
@@ -626,7 +667,10 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
               variant="primary"
               onClick={() => {
                 accionAdelanto.tipo === "editar"
-                  ? actions.editarAdelantoVehiculo(accionAdelanto.id, accionAdelanto.monto)
+                  ? actions.editarAdelantoVehiculo(
+                      accionAdelanto.id,
+                      accionAdelanto.monto,
+                    )
                   : actions.eliminarAdelantoVehiculo(accionAdelanto.id);
                 setAccionAdelanto(null);
               }}
@@ -636,12 +680,17 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
           </div>
         </div>
       </Sheet>
-      <Sheet open={confirmBaja} title="Confirmar baja" onClose={() => setConfirmBaja(false)}>
+      <Sheet
+        open={confirmBaja}
+        title="Confirmar baja"
+        onClose={() => setConfirmBaja(false)}
+      >
         <div className="space-y-4">
           <p className="text-gray-600 text-sm">
             {"¿Seguro que deseas dar de baja a "}
-            <strong>{vehiculo.nombre}</strong>? Se liquidará lo que tenga pendiente y dejará de
-            aparecer en las pantallas. Su histórico de pagos se conserva.
+            <strong>{vehiculo.nombre}</strong>? Se liquidará lo que tenga
+            pendiente y dejará de aparecer en las pantallas. Su histórico de
+            pagos se conserva.
           </p>
           {/* La base se niega si quedan jornadas de empleados sin liquidar en
               los partes de esa furgoneta. Se vuelve a preguntar en vez de
@@ -669,7 +718,9 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
                   onBack();
                 } catch (e) {
                   if (avisoBaja) throw e;
-                  setAvisoBaja(`${e.message}. Pulsa otra vez para darla de baja igualmente.`);
+                  setAvisoBaja(
+                    `${e.message}. Pulsa otra vez para darla de baja igualmente.`,
+                  );
                 }
               }}
             >
@@ -678,7 +729,11 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
           </div>
         </div>
       </Sheet>
-      <Sheet open={confirmPago} title="Confirmar pago" onClose={() => setConfirmPago(false)}>
+      <Sheet
+        open={confirmPago}
+        title="Confirmar pago"
+        onClose={() => setConfirmPago(false)}
+      >
         <div className="space-y-4">
           <p className="text-gray-600 text-sm">
             {"¿Liquidar el ciclo quincenal de "}

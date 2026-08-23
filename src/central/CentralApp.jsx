@@ -1,5 +1,13 @@
 import { useState } from "react";
-import { ChartColumn, FileText, LogOut, ScanLine, Settings, Truck, Users } from "lucide-react";
+import {
+  ChartColumn,
+  FileText,
+  LogOut,
+  ScanLine,
+  Settings,
+  Truck,
+  Users,
+} from "lucide-react";
 import { FichaTrabajador } from "./FichaTrabajador.jsx";
 import { FichaVehiculo } from "./FichaVehiculo.jsx";
 import { ConfigTab } from "./tabs/ConfigTab.jsx";
@@ -116,7 +124,8 @@ export function CentralTabs({ tab, setTab }) {
               }
               key={n.key}
             >
-              <n.icon className="w-[15px] h-[15px]" strokeWidth={1.8} /> {n.label}
+              <n.icon className="w-[15px] h-[15px]" strokeWidth={1.8} />{" "}
+              {n.label}
             </button>
           );
         })}
@@ -148,7 +157,10 @@ export function CentralApp({ onSalir }) {
     return (
       <CentralShell>
         <CentralHeader onSalir={onSalir} />
-        <p className="text-[13px] text-center pt-16" style={{ color: colors.muted }}>
+        <p
+          className="text-[13px] text-center pt-16"
+          style={{ color: colors.muted }}
+        >
           Cargando…
         </p>
       </CentralShell>
@@ -214,14 +226,26 @@ export function CentralApp({ onSalir }) {
         />
       ) : (
         <>
-          {tab === "escanear" && <EscanearTab state={state} actions={actions} />}
-          {tab === "reporte" && <ReporteDiarioTab state={state} actions={actions} />}
+          {tab === "escanear" && (
+            <EscanearTab state={state} actions={actions} />
+          )}
+          {tab === "reporte" && (
+            <ReporteDiarioTab state={state} actions={actions} />
+          )}
           {tab === "resumen" && <ResumenTab state={state} actions={actions} />}
           {tab === "registros" && (
-            <RegistrosTab state={state} actions={actions} onVerFicha={setFichaTrabajador} />
+            <RegistrosTab
+              state={state}
+              actions={actions}
+              onVerFicha={setFichaTrabajador}
+            />
           )}
           {tab === "vehiculos" && (
-            <VehiculosTab state={state} actions={actions} onVerFicha={setFichaVehiculo} />
+            <VehiculosTab
+              state={state}
+              actions={actions}
+              onVerFicha={setFichaVehiculo}
+            />
           )}
           {tab === "config" && <ConfigTab state={state} actions={actions} />}
         </>

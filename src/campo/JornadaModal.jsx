@@ -42,7 +42,8 @@ export function JornadaModal({
     // En alta siempre hay algo que guardar (8 h por defecto); acompletando hay
     // que teclear una cifra que valga algo, o no hay nada que mandar.
     puedeGuardar =
-      modo === "alta" || (editaHoras ? parseFloat(horas) > 0 : parseFloat(destajo) > 0);
+      modo === "alta" ||
+      (editaHoras ? parseFloat(horas) > 0 : parseFloat(destajo) > 0);
   return (
     <div
       className="fixed inset-0 z-[95] flex items-end sm:items-center justify-center sm:p-5"
@@ -107,13 +108,22 @@ export function JornadaModal({
               {!choferTomado && (
                 <span
                   className="block text-[11px] mt-0.5"
-                  style={{ color: esChofer ? "rgba(255,255,255,0.7)" : colors.muted }}
+                  style={{
+                    color: esChofer ? "rgba(255,255,255,0.7)" : colors.muted,
+                  }}
                 >
-                  {esChofer ? "Sí · cobra tarifa de chofer" : "No · toca para marcarlo"}
+                  {esChofer
+                    ? "Sí · cobra tarifa de chofer"
+                    : "No · toca para marcarlo"}
                 </span>
               )}
             </span>
-            {esChofer && <Check className="w-4 h-4 flex-shrink-0" style={{ color: "#fff" }} />}
+            {esChofer && (
+              <Check
+                className="w-4 h-4 flex-shrink-0"
+                style={{ color: "#fff" }}
+              />
+            )}
           </button>
         )}
         {modo === "alta" && (
@@ -140,13 +150,22 @@ export function JornadaModal({
               {!encargadoTomado && (
                 <span
                   className="block text-[11px] mt-0.5"
-                  style={{ color: esEncargado ? "rgba(255,255,255,0.7)" : colors.muted }}
+                  style={{
+                    color: esEncargado ? "rgba(255,255,255,0.7)" : colors.muted,
+                  }}
                 >
-                  {esEncargado ? "Sí · lleva el equipo" : "Opcional · toca para marcarlo"}
+                  {esEncargado
+                    ? "Sí · lleva el equipo"
+                    : "Opcional · toca para marcarlo"}
                 </span>
               )}
             </span>
-            {esEncargado && <Check className="w-4 h-4 flex-shrink-0" style={{ color: "#fff" }} />}
+            {esEncargado && (
+              <Check
+                className="w-4 h-4 flex-shrink-0"
+                style={{ color: "#fff" }}
+              />
+            )}
           </button>
         )}
         <div className="grid grid-cols-2 gap-3">

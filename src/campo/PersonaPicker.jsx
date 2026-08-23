@@ -11,10 +11,14 @@ export function PersonaPicker({ personas, onPick, buscador = false }) {
         return personas;
       }
       const o = normalizar(q).trim();
-      return o ? personas.filter((persona) => normalizar(persona.nombre).includes(o)) : personas;
+      return o
+        ? personas.filter((persona) => normalizar(persona.nombre).includes(o))
+        : personas;
     }, [personas, q, buscador]);
   return personas.length === 0 ? (
-    <p className="text-gray-500 text-xs text-center py-3">No quedan personas disponibles.</p>
+    <p className="text-gray-500 text-xs text-center py-3">
+      No quedan personas disponibles.
+    </p>
   ) : (
     <div>
       {buscador && (
@@ -42,7 +46,9 @@ export function PersonaPicker({ personas, onPick, buscador = false }) {
       )}
       <div className="space-y-1 max-h-60 overflow-y-auto">
         {lista.length === 0 ? (
-          <p className="text-gray-500 text-xs text-center py-4">Nadie coincide con “{q}”.</p>
+          <p className="text-gray-500 text-xs text-center py-4">
+            Nadie coincide con “{q}”.
+          </p>
         ) : (
           lista.map((o) => (
             <button

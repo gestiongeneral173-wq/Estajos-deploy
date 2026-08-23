@@ -4,7 +4,11 @@ import { colors, hexToRgba } from "../../theme.js";
 
 export function Num({ children, tone = "default", className = "" }) {
   const color =
-    tone === "muted" ? colors.muted : tone === "strong" ? colors.navyDark : colors.navyMedium;
+    tone === "muted"
+      ? colors.muted
+      : tone === "strong"
+        ? colors.navyDark
+        : colors.navyMedium;
   return (
     <span
       className={`cifra text-[13px] ${className}`}
@@ -18,7 +22,12 @@ export function Num({ children, tone = "default", className = "" }) {
 }
 
 export function StatusDot({ tone = "ok", className = "" }) {
-  const color = tone === "ok" ? colors.primary : tone === "pendiente" ? "#9DA19C" : colors.danger;
+  const color =
+    tone === "ok"
+      ? colors.primary
+      : tone === "pendiente"
+        ? "#9DA19C"
+        : colors.danger;
   return (
     <span
       className={`inline-block w-1.5 h-1.5 rounded-full flex-shrink-0 ${className}`}
@@ -29,7 +38,11 @@ export function StatusDot({ tone = "ok", className = "" }) {
   );
 }
 
-export function AvatarIcon({ size = 28, tone = "navy", icon: Icon = CircleUser }) {
+export function AvatarIcon({
+  size = 28,
+  tone = "navy",
+  icon: Icon = CircleUser,
+}) {
   return (
     <div
       style={{
@@ -291,7 +304,12 @@ export function StatCard({ value, label, color = "navy" }) {
   );
 }
 
-export function Accordion({ title, color = "green", children, defaultOpen = false }) {
+export function Accordion({
+  title,
+  color = "green",
+  children,
+  defaultOpen = false,
+}) {
   const [abierto, setAbierto] = useState(defaultOpen);
   return (
     <Card>

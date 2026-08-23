@@ -38,7 +38,14 @@ import { colors, hexToRgba } from "../theme.js";
  * de la base se encarga del resto: anula el PIN activo y desactiva su perfil.
  * Sin perfil activo, `verificar_pin()` ya no le devuelve sesión.
  */
-function SwitchEncargado({ trabajador, actions, pinNuevo, setPinNuevo, ocupado, setOcupado }) {
+function SwitchEncargado({
+  trabajador,
+  actions,
+  pinNuevo,
+  setPinNuevo,
+  ocupado,
+  setOcupado,
+}) {
   const esEncargado = trabajador.es_encargado;
 
   const cambiar = async () => {
@@ -52,7 +59,9 @@ function SwitchEncargado({ trabajador, actions, pinNuevo, setPinNuevo, ocupado, 
       if (!confirmado) return;
       setOcupado(true);
       try {
-        await actions.actualizarTrabajador(trabajador.id, { es_encargado: false });
+        await actions.actualizarTrabajador(trabajador.id, {
+          es_encargado: false,
+        });
         setPinNuevo(null);
       } catch {
         // El aviso lo pinta CentralApp a partir del error del store.
@@ -93,7 +102,10 @@ function SwitchEncargado({ trabajador, actions, pinNuevo, setPinNuevo, ocupado, 
       <div className="flex items-center gap-3">
         <div className="flex-1 min-w-0">
           <p className="eyebrow text-gray-500">Rol</p>
-          <p className="text-sm font-semibold" style={{ color: colors.navyDark }}>
+          <p
+            className="text-sm font-semibold"
+            style={{ color: colors.navyDark }}
+          >
             {esEncargado ? "Encargado de campo" : "Empleado"}
           </p>
           <p className="text-[11px] text-gray-500 mt-0.5">
@@ -106,7 +118,9 @@ function SwitchEncargado({ trabajador, actions, pinNuevo, setPinNuevo, ocupado, 
           type="button"
           role="switch"
           aria-checked={esEncargado}
-          aria-label={esEncargado ? "Quitar rol de encargado" : "Hacer encargado"}
+          aria-label={
+            esEncargado ? "Quitar rol de encargado" : "Hacer encargado"
+          }
           disabled={ocupado}
           onClick={cambiar}
           className="w-[52px] h-[30px] rounded-full flex-shrink-0 p-[3px] transition-colors disabled:opacity-40"
@@ -114,13 +128,20 @@ function SwitchEncargado({ trabajador, actions, pinNuevo, setPinNuevo, ocupado, 
         >
           <span
             className="block w-6 h-6 rounded-full bg-white shadow transition-transform"
-            style={{ transform: esEncargado ? "translateX(22px)" : "translateX(0)" }}
+            style={{
+              transform: esEncargado ? "translateX(22px)" : "translateX(0)",
+            }}
           />
         </button>
       </div>
 
       {esEncargado && !pinNuevo && (
-        <Button variant="outline" className="mt-3" disabled={ocupado} onClick={rotar}>
+        <Button
+          variant="outline"
+          className="mt-3"
+          disabled={ocupado}
+          onClick={rotar}
+        >
           Generar un PIN nuevo
         </Button>
       )}
@@ -135,7 +156,8 @@ function SwitchEncargado({ trabajador, actions, pinNuevo, setPinNuevo, ocupado, 
         >
           <p className="eyebrow text-gray-600">PIN generado</p>
           <p className="text-[11px] text-gray-600 -mt-0.5 mb-1">
-            Apúntalo ahora: no se puede volver a ver. Si se pierde, se genera otro.
+            Apúntalo ahora: no se puede volver a ver. Si se pierde, se genera
+            otro.
           </p>
           <p
             className="text-2xl font-semibold tracking-widest cifra"
@@ -143,7 +165,10 @@ function SwitchEncargado({ trabajador, actions, pinNuevo, setPinNuevo, ocupado, 
           >
             {pinNuevo}
           </p>
-          <button onClick={() => setPinNuevo(null)} className="text-gray-600 text-xs mt-1">
+          <button
+            onClick={() => setPinNuevo(null)}
+            className="text-gray-600 text-xs mt-1"
+          >
             Ocultar
           </button>
         </div>
@@ -168,7 +193,8 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
     // Suelo de la fecha del adelanto: el inicio del ciclo vigente de esta
     // persona. Un ciclo ya cerrado no admite adelantos nuevos, y la base lo
     // rechaza igual (0015).
-    inicioCiclo = state.periodos?.[trabajador?.payment_period ?? "quincenal"]?.inicio || "",
+    inicioCiclo =
+      state.periodos?.[trabajador?.payment_period ?? "quincenal"]?.inicio || "",
     tarifaValida = parseFloat(form.tarifa_hora) > 0,
     [adelantoEditando, setAdelantoEditando] = useState(null),
     [valorAdelanto, setValorAdelanto] = useState(""),
@@ -195,7 +221,11 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
           >
             Trabajador no encontrado.
           </p>
-          <Button variant="outline" icon={<ArrowLeft className="w-4 h-4" />} onClick={onBack}>
+          <Button
+            variant="outline"
+            icon={<ArrowLeft className="w-4 h-4" />}
+            onClick={onBack}
+          >
             Volver a registros
           </Button>
         </Card>
@@ -231,7 +261,9 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
               >
                 {trabajador.nombre} {trabajador.apellido}
               </h2>
-              <CodeBadge code={trabajador.payment_period === "mensual" ? "M" : "Q"} />
+              <CodeBadge
+                code={trabajador.payment_period === "mensual" ? "M" : "Q"}
+              />
             </div>
             <p className="text-gray-600 text-xs mt-1">{trabajador.telefono}</p>
             <p className="text-gray-500 text-[11px] mt-0.5">
@@ -242,9 +274,14 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
                 pertenece el trabajo ya registrado, así que el cambio espera al
                 próximo pago (lo aplica `liquidar_trabajador`). */}
             {trabajador.payment_period_pendiente && (
-              <p className="text-[11px] mt-0.5" style={{ color: colors.primary }}>
+              <p
+                className="text-[11px] mt-0.5"
+                style={{ color: colors.primary }}
+              >
                 {"Pasará a "}
-                {trabajador.payment_period_pendiente === "mensual" ? "mensual" : "quincenal"}
+                {trabajador.payment_period_pendiente === "mensual"
+                  ? "mensual"
+                  : "quincenal"}
                 {" en el próximo pago"}
               </p>
             )}
@@ -297,7 +334,11 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
             onClick={() => setTarifaOculta((Yz) => !Yz)}
             className="absolute top-0 right-3 p-1.5 text-gray-400 hover:text-gray-600 active:scale-90"
           >
-            {tarifaOculta ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+            {tarifaOculta ? (
+              <EyeOff className="w-3.5 h-3.5" />
+            ) : (
+              <Eye className="w-3.5 h-3.5" />
+            )}
           </button>
         </div>
       </Card>
@@ -372,7 +413,8 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
                 <option value="quincenal">Quincenal</option>
               </select>
               <p className="mt-1.5 text-[11px] text-gray-500">
-                El cambio no se aplica ahora: entra en vigor con el próximo pago.
+                El cambio no se aplica ahora: entra en vigor con el próximo
+                pago.
               </p>
             </div>
             <Input
@@ -414,15 +456,22 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
       <Card>
         <SectionTitle color="green">{`Nómina Actual (${pend.jornadas.length})`}</SectionTitle>
         {pend.jornadas.length === 0 ? (
-          <p className="text-gray-500 text-xs text-center py-4">Sin jornadas.</p>
+          <p className="text-gray-500 text-xs text-center py-4">
+            Sin jornadas.
+          </p>
         ) : (
           <div className="space-y-1">
             <div className="grid grid-cols-6 gap-1 pb-2 border-b border-gray-100">
-              {["Fecha", "Horas", "Destajo", "Tarifa", "Subtotal", ""].map((T, XVar) => (
-                <p className="eyebrow text-gray-500 text-center first:text-left" key={XVar}>
-                  {T}
-                </p>
-              ))}
+              {["Fecha", "Horas", "Destajo", "Tarifa", "Subtotal", ""].map(
+                (T, XVar) => (
+                  <p
+                    className="eyebrow text-gray-500 text-center first:text-left"
+                    key={XVar}
+                  >
+                    {T}
+                  </p>
+                ),
+              )}
             </div>
             {pend.jornadas.map((jornada) => {
               const XVar = jornadaEditando === jornada.id,
@@ -485,7 +534,9 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
                       {eur(jornada.destajo)}
                     </p>
                   )}
-                  <p className="text-[11px] text-center text-gray-500">{eur(jornada.tarifa)}/h</p>
+                  <p className="text-[11px] text-center text-gray-500">
+                    {eur(jornada.tarifa)}/h
+                  </p>
                   <p
                     className="text-[11px] text-right font-semibold"
                     style={{
@@ -510,7 +561,10 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
                       >
                         <Check className="w-3.5 h-3.5" />
                       </button>
-                      <button onClick={() => setJornadaEditando(null)} className="text-gray-500">
+                      <button
+                        onClick={() => setJornadaEditando(null)}
+                        className="text-gray-500"
+                      >
                         <X className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -559,7 +613,11 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
             className="w-auto px-4"
             disabled={!montoAdelanto}
             onClick={() => {
-              actions.registrarAdelanto(id, parseFloat(montoAdelanto) || 0, fechaAdelanto);
+              actions.registrarAdelanto(
+                id,
+                parseFloat(montoAdelanto) || 0,
+                fechaAdelanto,
+              );
               setMontoAdelanto("");
               setFechaAdelanto(hoy());
             }}
@@ -574,7 +632,9 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
         defaultOpen={pend.adelantos.length > 0}
       >
         {pend.adelantos.length === 0 ? (
-          <p className="text-gray-500 text-xs text-center py-4">Sin adelantos.</p>
+          <p className="text-gray-500 text-xs text-center py-4">
+            Sin adelantos.
+          </p>
         ) : (
           <div className="space-y-2">
             {pend.adelantos.map((adelanto) => (
@@ -614,7 +674,10 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
                     >
                       <Check className="w-3.5 h-3.5" />
                     </button>
-                    <button onClick={() => setAdelantoEditando(null)} className="text-gray-500">
+                    <button
+                      onClick={() => setAdelantoEditando(null)}
+                      className="text-gray-500"
+                    >
                       <X className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -655,16 +718,23 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
           </div>
         )}
       </Accordion>
-      <Accordion title={`Nóminas Anteriores (${pagosDelTrabajador.length})`} color="green">
+      <Accordion
+        title={`Nóminas Anteriores (${pagosDelTrabajador.length})`}
+        color="green"
+      >
         {pagosDelTrabajador.length === 0 ? (
-          <p className="text-gray-500 text-xs text-center py-4">Sin pagos registrados.</p>
+          <p className="text-gray-500 text-xs text-center py-4">
+            Sin pagos registrados.
+          </p>
         ) : (
           <div className="space-y-2">
             {pagosDelTrabajador.map((T) => (
               <div className="border-b border-gray-50 last:border-0" key={T.id}>
                 <button
                   type="button"
-                  onClick={() => setPagoAbierto((Ys) => (Ys === T.id ? null : T.id))}
+                  onClick={() =>
+                    setPagoAbierto((Ys) => (Ys === T.id ? null : T.id))
+                  }
                   className="w-full flex items-center justify-between py-2 text-left"
                 >
                   <div>
@@ -713,16 +783,21 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
                     ) : (
                       <div className="border border-gray-200 rounded-lg overflow-hidden">
                         <div className="grid grid-cols-6 gap-1 bg-gray-50 p-2 eyebrow text-gray-600">
-                          {["Fecha", "Horas", "Destajo", "Tarifa", "Subtotal", ""].map(
-                            (XVar, H) => (
-                              <p
-                                className="eyebrow text-gray-500 text-center first:text-left"
-                                key={H}
-                              >
-                                {XVar}
-                              </p>
-                            ),
-                          )}
+                          {[
+                            "Fecha",
+                            "Horas",
+                            "Destajo",
+                            "Tarifa",
+                            "Subtotal",
+                            "",
+                          ].map((XVar, H) => (
+                            <p
+                              className="eyebrow text-gray-500 text-center first:text-left"
+                              key={H}
+                            >
+                              {XVar}
+                            </p>
+                          ))}
                         </div>
                         {T.dias.map((XVar) => (
                           <div
@@ -735,9 +810,15 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
                             <span>{XVar.fecha}</span>
                             <span className="text-center">{XVar.horas}</span>
                             <span className="text-center">€{XVar.destajo}</span>
-                            <span className="text-center text-gray-500">€{XVar.tarifa}/h</span>
+                            <span className="text-center text-gray-500">
+                              €{XVar.tarifa}/h
+                            </span>
                             <span className="text-right font-semibold">
-                              €{(XVar.horas * XVar.tarifa + Number(XVar.destajo)).toFixed(2)}
+                              €
+                              {(
+                                XVar.horas * XVar.tarifa +
+                                Number(XVar.destajo)
+                              ).toFixed(2)}
                             </span>
                             <span />
                           </div>
@@ -754,7 +835,8 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
       <Card>
         <SectionTitle color="gold">Dar de baja</SectionTitle>
         <p className="text-gray-500 text-[11px] mb-3">
-          Calcula lo que se le debe, liquida ese monto y retira al trabajador de forma permanente.
+          Calcula lo que se le debe, liquida ese monto y retira al trabajador de
+          forma permanente.
         </p>
         <Button
           variant="danger"
@@ -767,7 +849,8 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
       <Sheet
         open={!!confirmAdelanto}
         title={
-          (confirmAdelanto == null ? undefined : confirmAdelanto.tipo) === "editar"
+          (confirmAdelanto == null ? undefined : confirmAdelanto.tipo) ===
+          "editar"
             ? "Confirmar edición"
             : "Confirmar eliminación"
         }
@@ -775,7 +858,8 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
       >
         <div className="space-y-4">
           <p className="text-gray-600 text-sm">
-            {(confirmAdelanto == null ? undefined : confirmAdelanto.tipo) === "editar"
+            {(confirmAdelanto == null ? undefined : confirmAdelanto.tipo) ===
+            "editar"
               ? `¿Actualizar el monto de este adelanto a ${eur((confirmAdelanto == null ? undefined : confirmAdelanto.monto) ?? 0)}?`
               : "¿Eliminar este adelanto? Esta acción no se puede deshacer."}
           </p>
@@ -787,7 +871,10 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
               variant="primary"
               onClick={() => {
                 confirmAdelanto.tipo === "editar"
-                  ? (actions.editarAdelanto(confirmAdelanto.id, confirmAdelanto.monto),
+                  ? (actions.editarAdelanto(
+                      confirmAdelanto.id,
+                      confirmAdelanto.monto,
+                    ),
                     setAdelantoEditando(null))
                   : actions.eliminarAdelanto(confirmAdelanto.id);
                 setConfirmAdelanto(null);
@@ -798,7 +885,11 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
           </div>
         </div>
       </Sheet>
-      <Sheet open={confirmBaja} title="Confirmar baja" onClose={() => setConfirmBaja(false)}>
+      <Sheet
+        open={confirmBaja}
+        title="Confirmar baja"
+        onClose={() => setConfirmBaja(false)}
+      >
         <div className="space-y-4">
           <div className="bg-gray-50 rounded-xl p-3 space-y-1 text-xs">
             <div className="flex justify-between">
@@ -824,11 +915,14 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
               </span>
             </div>
             <div className="flex justify-between pt-1 border-t border-gray-200">
-              <span className="text-gray-700 font-semibold">Neto a liquidar</span>
+              <span className="text-gray-700 font-semibold">
+                Neto a liquidar
+              </span>
               <span
                 className="font-semibold"
                 style={{
-                  color: resumenBaja.monto_neto < 0 ? colors.danger : colors.primary,
+                  color:
+                    resumenBaja.monto_neto < 0 ? colors.danger : colors.primary,
                 }}
               >
                 {eur(resumenBaja.monto_neto)}

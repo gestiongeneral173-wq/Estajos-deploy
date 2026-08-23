@@ -19,7 +19,8 @@ export function formatFecha(fecha) {
 }
 
 /** "2026-08-03" -> "03/08" */
-export const ddmm = (fecha) => (fecha ? `${fecha.slice(8, 10)}/${fecha.slice(5, 7)}` : "");
+export const ddmm = (fecha) =>
+  fecha ? `${fecha.slice(8, 10)}/${fecha.slice(5, 7)}` : "";
 
 /** Minúsculas sin acentos, para buscar "Nuñez" escribiendo "nunez". */
 export const normalizar = (texto) =>

@@ -1,7 +1,13 @@
 import { useMemo, useState } from "react";
 import { ArrowLeft, CircleUser, Clock, Search, Wallet } from "lucide-react";
 import { CodeBadge } from "../../components/ui/Badges.jsx";
-import { Button, Card, IconBubble, Input, SectionTitle } from "../../components/ui/primitives.jsx";
+import {
+  Button,
+  Card,
+  IconBubble,
+  Input,
+  SectionTitle,
+} from "../../components/ui/primitives.jsx";
 import { calcEmpleado } from "../../lib/calculos.js";
 import { eur, hoy } from "../../lib/format.js";
 import { colors, hexToRgba } from "../../theme.js";
@@ -18,7 +24,10 @@ export function EscanearTab({ state, actions }) {
           return {
             ...N,
             ...I,
-            pagado: I.totalPagar <= 0 && I.jornadas.length === 0 && I.adelantos.length === 0,
+            pagado:
+              I.totalPagar <= 0 &&
+              I.jornadas.length === 0 &&
+              I.adelantos.length === 0,
           };
         }),
       [trabajadores, state],
@@ -31,7 +40,9 @@ export function EscanearTab({ state, actions }) {
               var d;
               return (
                 `${p.nombre} ${p.apellido}`.toLowerCase().includes(N) ||
-                ((d = p.telefono) == null ? undefined : d.toLowerCase().includes(N))
+                ((d = p.telefono) == null
+                  ? undefined
+                  : d.toLowerCase().includes(N))
               );
             })
           : conSaldo),
@@ -40,7 +51,9 @@ export function EscanearTab({ state, actions }) {
     trabajador = trabajadores.find((N) => N.id === seleccionado),
     pend = seleccionado ? calcEmpleado(state, seleccionado) : null,
     esPagado = pend
-      ? pend.totalPagar <= 0 && pend.jornadas.length === 0 && pend.adelantos.length === 0
+      ? pend.totalPagar <= 0 &&
+        pend.jornadas.length === 0 &&
+        pend.adelantos.length === 0
       : false,
     reset = () => {
       setSeleccionado(null);
@@ -69,7 +82,9 @@ export function EscanearTab({ state, actions }) {
           </div>
           <div className="space-y-1 max-h-80 overflow-y-auto">
             {lista.length === 0 ? (
-              <p className="text-gray-500 text-xs text-center py-4">Sin coincidencias.</p>
+              <p className="text-gray-500 text-xs text-center py-4">
+                Sin coincidencias.
+              </p>
             ) : (
               lista.map((N) => (
                 <button
@@ -90,7 +105,10 @@ export function EscanearTab({ state, actions }) {
                       >
                         {N.nombre} {N.apellido}
                       </p>
-                      <CodeBadge code={N.payment_period === "mensual" ? "M" : "Q"} size={14} />
+                      <CodeBadge
+                        code={N.payment_period === "mensual" ? "M" : "Q"}
+                        size={14}
+                      />
                     </div>
                     <p className="text-[11px] text-gray-500">{N.telefono}</p>
                   </div>
@@ -120,12 +138,18 @@ export function EscanearTab({ state, actions }) {
                   >
                     {trabajador.nombre} {trabajador.apellido}
                   </p>
-                  <CodeBadge code={trabajador.payment_period === "mensual" ? "M" : "Q"} />
+                  <CodeBadge
+                    code={trabajador.payment_period === "mensual" ? "M" : "Q"}
+                  />
                 </div>
-                <p className="text-gray-600 text-[11px]">{trabajador.telefono}</p>
+                <p className="text-gray-600 text-[11px]">
+                  {trabajador.telefono}
+                </p>
                 <p className="text-gray-500 text-[11px]">
                   {"Ciclo: "}
-                  {trabajador.payment_period === "mensual" ? "Mensual" : "Quincenal"}
+                  {trabajador.payment_period === "mensual"
+                    ? "Mensual"
+                    : "Quincenal"}
                 </p>
               </div>
             </div>
@@ -167,7 +191,10 @@ export function EscanearTab({ state, actions }) {
               trabajadorId={trabajador.id}
               adelantos={pend.adelantos}
               pendiente={pend.totalPagar}
-              inicioCiclo={state.periodos?.[trabajador.payment_period ?? "quincenal"]?.inicio || ""}
+              inicioCiclo={
+                state.periodos?.[trabajador.payment_period ?? "quincenal"]
+                  ?.inicio || ""
+              }
               actions={actions}
               onBack={() => setModo("menu")}
             />
@@ -216,7 +243,9 @@ export function AdelantosView({
       const importe = parseFloat(monto) || 0;
       if (
         importe > pendiente &&
-        !window.confirm("El monto a pagar es mayor al trabajado, ¿Proceder con el pago?")
+        !window.confirm(
+          "El monto a pagar es mayor al trabajado, ¿Proceder con el pago?",
+        )
       ) {
         return;
       }
@@ -234,7 +263,9 @@ export function AdelantosView({
           <span className="text-right">Monto</span>
         </div>
         {adelantos.length === 0 ? (
-          <p className="text-gray-500 text-xs text-center py-3">Sin adelantos en este ciclo.</p>
+          <p className="text-gray-500 text-xs text-center py-3">
+            Sin adelantos en este ciclo.
+          </p>
         ) : (
           adelantos.map((adelanto) => (
             <div
@@ -245,7 +276,9 @@ export function AdelantosView({
               key={adelanto.id}
             >
               <span>{adelanto.fecha}</span>
-              <span className="text-right font-semibold">{eur(adelanto.monto)}</span>
+              <span className="text-right font-semibold">
+                {eur(adelanto.monto)}
+              </span>
             </div>
           ))
         )}
@@ -279,10 +312,15 @@ export function AdelantosView({
           onChange={(i) => setFecha(i.target.value)}
         />
         <p className="text-[11px] text-gray-500 text-center">
-          La fecha decide en qué ciclo se descuenta. No se puede anotar en un ciclo ya cerrado.
+          La fecha decide en qué ciclo se descuenta. No se puede anotar en un
+          ciclo ya cerrado.
         </p>
         <div className="grid grid-cols-2 gap-3">
-          <Button variant="outline" icon={<ArrowLeft className="w-4 h-4" />} onClick={onBack}>
+          <Button
+            variant="outline"
+            icon={<ArrowLeft className="w-4 h-4" />}
+            onClick={onBack}
+          >
             Volver
           </Button>
           <Button
@@ -298,7 +336,14 @@ export function AdelantosView({
   );
 }
 
-export function LiquidacionView({ trabajador, pend, esPagado, actions, onBack, onPaid }) {
+export function LiquidacionView({
+  trabajador,
+  pend,
+  esPagado,
+  actions,
+  onBack,
+  onPaid,
+}) {
   return (
     <Card>
       <SectionTitle color="green">Liquidación · Ciclo activo</SectionTitle>
@@ -326,7 +371,11 @@ export function LiquidacionView({ trabajador, pend, esPagado, actions, onBack, o
               <span>{jornada.horas}</span>
               <span>€{jornada.destajo}</span>
               <span className="text-right font-semibold">
-                €{(jornada.horas * jornada.tarifa + Number(jornada.destajo)).toFixed(2)}
+                €
+                {(
+                  jornada.horas * jornada.tarifa +
+                  Number(jornada.destajo)
+                ).toFixed(2)}
               </span>
             </div>
           ))
@@ -361,7 +410,11 @@ export function LiquidacionView({ trabajador, pend, esPagado, actions, onBack, o
         </div>
       </div>
       <div className="grid grid-cols-2 gap-3 mt-4">
-        <Button variant="outline" icon={<ArrowLeft className="w-4 h-4" />} onClick={onBack}>
+        <Button
+          variant="outline"
+          icon={<ArrowLeft className="w-4 h-4" />}
+          onClick={onBack}
+        >
           Volver
         </Button>
         <Button
@@ -380,12 +433,31 @@ export function LiquidacionView({ trabajador, pend, esPagado, actions, onBack, o
 }
 
 export function AgregarHorasView({ trabajadorId, actions, onBack }) {
+  const HOY = hoy();
   const [horas, setHoras] = useState(""),
-    [destajo, setDestajo] = useState("");
+    [destajo, setDestajo] = useState(""),
+    // Las horas no siempre se apuntan el día que se trabajaron. La base ya
+    // recibía la fecha (`registrar_horas_central`); lo que faltaba era
+    // preguntarla en vez de dar hoy por hecho.
+    [fecha, setFecha] = useState(HOY);
   return (
     <Card>
-      <SectionTitle color="gold">Agregar horas · Hoy</SectionTitle>
+      <SectionTitle color="gold">
+        {fecha === HOY ? "Agregar horas · Hoy" : "Agregar horas"}
+      </SectionTitle>
       <div className="space-y-4">
+        <Input
+          label="Día trabajado"
+          type="date"
+          value={fecha}
+          max={HOY}
+          onChange={(i) => setFecha(i.target.value || HOY)}
+          hint={
+            fecha === HOY
+              ? undefined
+              : "Se apuntará en esa fecha, no en la de hoy."
+          }
+        />
         <Input
           label="Horas trabajadas"
           type="number"
@@ -409,6 +481,7 @@ export function AgregarHorasView({ trabajadorId, actions, onBack }) {
                 trabajadorId,
                 parseFloat(horas) || 0,
                 parseFloat(destajo) || 0,
+                fecha,
               );
               onBack();
             }}

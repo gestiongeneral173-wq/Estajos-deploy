@@ -7,14 +7,23 @@ import { rosterToList } from "../lib/calculos.js";
 import { formatFecha, hoy } from "../lib/format.js";
 import { colors, hexToRgba } from "../theme.js";
 
-export function CampoInicio({ registrosCampo, vehiculos, personas, onLogout, onAbrirRegistro }) {
+export function CampoInicio({
+  registrosCampo,
+  vehiculos,
+  personas,
+  onLogout,
+  onAbrirRegistro,
+}) {
   const HOY = hoy();
   const fechaInputRef = useRef(null);
   const [fecha, setFecha] = useState(HOY),
     delDia = registrosCampo[fecha] || {},
     cerradas = vehiculos.filter((vehiculo) => delDia[vehiculo.id]),
     pendientes = vehiculos.filter((vehiculo) => !delDia[vehiculo.id]),
-    totalPersonas = cerradas.reduce((i, cerrada) => i + rosterToList(delDia[cerrada.id]).length, 0);
+    totalPersonas = cerradas.reduce(
+      (i, cerrada) => i + rosterToList(delDia[cerrada.id]).length,
+      0,
+    );
   return (
     <div
       className="min-h-screen pb-28"

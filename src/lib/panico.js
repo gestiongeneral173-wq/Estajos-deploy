@@ -34,7 +34,8 @@ const oyentes = new Set();
 export const hayCorte = () => cortado;
 
 /** ¿Este error puede ser el corte? No lo confirma: sólo levanta la sospecha. */
-export const pareceCorte = (error) => Boolean(error) && CODIGOS.has(error.code ?? "");
+export const pareceCorte = (error) =>
+  Boolean(error) && CODIGOS.has(error.code ?? "");
 
 export function alCortar(fn) {
   oyentes.add(fn);

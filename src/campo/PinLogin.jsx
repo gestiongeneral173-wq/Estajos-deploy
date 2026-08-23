@@ -71,14 +71,20 @@ export function PinLogin({ onOpenCentral }) {
         className="text-[13px] mt-3 text-center min-h-[18px] px-6"
         style={{ color: error ? colors.danger : colors.muted }}
       >
-        {comprobando ? "Comprobando…" : (error ?? "Introduce tu PIN de encargado")}
+        {comprobando
+          ? "Comprobando…"
+          : (error ?? "Introduce tu PIN de encargado")}
       </p>
 
-      <div className={`flex gap-2.5 my-9 ${shake ? "animate-[shake_0.4s]" : ""}`}>
+      <div
+        className={`flex gap-2.5 my-9 ${shake ? "animate-[shake_0.4s]" : ""}`}
+      >
         {[0, 1, 2, 3].map((i) => (
           <div
             className="w-2 h-2 rounded-full transition-all"
-            style={{ background: i < pin.length ? colors.navyDark : colors.line }}
+            style={{
+              background: i < pin.length ? colors.navyDark : colors.line,
+            }}
             key={i}
           />
         ))}
