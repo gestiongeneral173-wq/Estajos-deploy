@@ -8,7 +8,7 @@ import {
   Input,
   SectionTitle,
 } from "../../components/ui/primitives.jsx";
-import { calcEmpleado } from "../../lib/calculos.js";
+import { calcEmpleado, estadoPago } from "../../lib/calculos.js";
 import { diaSemana, eur, hoy } from "../../lib/format.js";
 import { colors, hexToRgba } from "../../theme.js";
 
@@ -19,17 +19,11 @@ export function EscanearTab({ state, actions }) {
     [q, setQ] = useState(""),
     conSaldo = useMemo(
       () =>
-        trabajadores.map((N) => {
-          const I = calcEmpleado(state, N.id);
-          return {
-            ...N,
-            ...I,
-            pagado:
-              I.totalPagar <= 0 &&
-              I.jornadas.length === 0 &&
-              I.adelantos.length === 0,
-          };
-        }),
+        trabajadores.map((N) => ({
+          ...N,
+          ...calcEmpleado(state, N.id),
+          estado: estadoPago(state, N.id),
+        })),
       [trabajadores, state],
     ),
     lista = useMemo(() => {
@@ -46,15 +40,18 @@ export function EscanearTab({ state, actions }) {
               );
             })
           : conSaldo),
-      ].sort((p, d) => Number(p.pagado) - Number(d.pagado));
+        // Quien tiene algo pendiente sube primero; "pagado" y "sin movimientos"
+        // se quedan abajo revueltos, que entre esos dos no hay nada que priorizar.
+      ].sort(
+        (p, d) =>
+          Number(p.estado === "pendiente" ? 0 : 1) -
+          Number(d.estado === "pendiente" ? 0 : 1),
+      );
     }, [q, conSaldo]),
     trabajador = trabajadores.find((N) => N.id === seleccionado),
     pend = seleccionado ? calcEmpleado(state, seleccionado) : null,
-    esPagado = pend
-      ? pend.totalPagar <= 0 &&
-        pend.jornadas.length === 0 &&
-        pend.adelantos.length === 0
-      : false,
+    estado = seleccionado ? estadoPago(state, seleccionado) : null,
+    esPagado = estado === "pagado",
     reset = () => {
       setSeleccionado(null);
       setModo("menu");
@@ -91,7 +88,8 @@ export function EscanearTab({ state, actions }) {
                   onClick={() => setSeleccionado(N.id)}
                   className="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl text-left transition-colors active:scale-95"
                   style={{
-                    background: N.pagado ? "#F0F4F1" : "#F8F8F6",
+                    background:
+                      N.estado === "pendiente" ? "#F8F8F6" : "#F0F4F1",
                   }}
                   key={N.id}
                 >
@@ -112,9 +110,14 @@ export function EscanearTab({ state, actions }) {
                     </div>
                     <p className="text-[11px] text-gray-500">{N.telefono}</p>
                   </div>
-                  {N.pagado && (
+                  {N.estado === "pagado" && (
                     <span className="shrink-0 px-2 py-0.5 rounded-full text-[11px] font-medium bg-green-100 text-green-700">
                       Pagado
+                    </span>
+                  )}
+                  {N.estado === "sin_movimientos" && (
+                    <span className="shrink-0 px-2 py-0.5 rounded-full text-[11px] font-medium bg-gray-100 text-gray-500">
+                      Sin movimientos
                     </span>
                   )}
                 </button>
@@ -156,6 +159,11 @@ export function EscanearTab({ state, actions }) {
             {esPagado && (
               <div className="mt-3 p-2 bg-green-100 border border-green-300 rounded-lg text-center text-green-700 font-semibold text-xs">
                 Pagado en este ciclo
+              </div>
+            )}
+            {estado === "sin_movimientos" && (
+              <div className="mt-3 p-2 bg-gray-100 border border-gray-200 rounded-lg text-center text-gray-500 font-semibold text-xs">
+                Sin movimientos en este ciclo
               </div>
             )}
           </Card>
@@ -203,7 +211,7 @@ export function EscanearTab({ state, actions }) {
             <LiquidacionView
               trabajador={trabajador}
               pend={pend}
-              esPagado={esPagado}
+              estado={estado}
               actions={actions}
               onBack={() => setModo("menu")}
               onPaid={reset}
@@ -339,11 +347,13 @@ export function AdelantosView({
 export function LiquidacionView({
   trabajador,
   pend,
-  esPagado,
+  estado,
   actions,
   onBack,
   onPaid,
 }) {
+  const esPagado = estado === "pagado",
+    sinMovimientos = estado === "sin_movimientos";
   return (
     <Card>
       <SectionTitle color="green">Liquidación · Ciclo activo</SectionTitle>
@@ -419,13 +429,17 @@ export function LiquidacionView({
         </Button>
         <Button
           variant="primary"
-          disabled={esPagado || pend.jornadas.length === 0}
+          disabled={esPagado || sinMovimientos || pend.jornadas.length === 0}
           onClick={() => {
             actions.pagarEmpleado(trabajador.id);
             onPaid();
           }}
         >
-          {esPagado ? "YA PAGADO" : "CONFIRMAR PAGO"}
+          {esPagado
+            ? "YA PAGADO"
+            : sinMovimientos
+              ? "NADA QUE PAGAR"
+              : "CONFIRMAR PAGO"}
         </Button>
       </div>
     </Card>

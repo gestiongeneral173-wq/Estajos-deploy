@@ -110,6 +110,32 @@ export function calcEmpleado(state, empleadoId) {
   };
 }
 
+/**
+ * "Pendiente" / "pagado" / "sin_movimientos" — no dos, tres. Un alta de hoy
+ * que nunca ha trabajado no es lo mismo que alguien que ya cobró, y antes la
+ * pantalla los confundía: los dos salían con la misma insignia verde.
+ *
+ * Emparejar por `periodo_fin`, no por `periodo_inicio`: cuando alguien
+ * arrastra días de un ciclo anterior, `liquidar_trabajador` retrasa el inicio
+ * del pago hasta el más viejo de esos días — el inicio deja de coincidir con
+ * el ciclo, pero el fin es siempre exactamente el cierre.
+ */
+export function estadoPago(state, empleadoId) {
+  const pend = calcEmpleado(state, empleadoId);
+  if (pend.jornadas.length > 0 || pend.adelantos.length > 0) return "pendiente";
+
+  const trabajador = state.trabajadores?.find((t) => t.id === empleadoId);
+  const finVigente =
+    state.periodos?.[trabajador?.payment_period ?? "quincenal"]?.fin;
+  const pagado =
+    !!finVigente &&
+    (state.pagos ?? []).some(
+      (pago) =>
+        pago.empleado_id === empleadoId && pago.periodo_fin === finVigente,
+    );
+  return pagado ? "pagado" : "sin_movimientos";
+}
+
 export function saldoEmpleado(state, empleadoId) {
   return calcEmpleado(state, empleadoId).totalPagar;
 }
