@@ -126,7 +126,9 @@ const state = {
       editada_manual: false,
     },
   ],
-  adelantosVehiculo: [{ id: "av1", vehiculo_id: "v1", concepto: "Espejo", monto: 40 }],
+  adelantosVehiculo: [
+    { id: "av1", vehiculo_id: "v1", concepto: "Espejo", monto: 40 },
+  ],
   pagosVehiculo: [
     {
       id: "pv-pago",
@@ -158,7 +160,14 @@ const state = {
       periodo_fin: HOY,
       encargado: "Ana Encargada",
       total_monto: 120,
-      items: [{ empleado_id: "t1", vehiculo_id: null, nombre: "Ana Encargada", total_pagado: 120 }],
+      items: [
+        {
+          empleado_id: "t1",
+          vehiculo_id: null,
+          nombre: "Ana Encargada",
+          total_pagado: 120,
+        },
+      ],
     },
   ],
   listasFurgonetas: [],
@@ -197,7 +206,10 @@ const registrosCampo = {
       registradoPor: "t1",
       chofer: "t2",
       pasajeros: [],
-      horasRoles: { t1: { horas: 8, destajo: 0 }, t2: { horas: 8, destajo: 0 } },
+      horasRoles: {
+        t1: { horas: 8, destajo: 0 },
+        t2: { horas: 8, destajo: 0 },
+      },
     },
   },
 };
@@ -280,7 +292,14 @@ const casos = [
       onCancel={noop}
       onConfirm={noop}
     />,
-    ["Jornada de", "Conduce la furgoneta", "Va de encargado", "Horas", "Destajo", "Añadir"],
+    [
+      "Jornada de",
+      "Conduce la furgoneta",
+      "Va de encargado",
+      "Horas",
+      "Destajo",
+      "Añadir",
+    ],
   ],
   [
     "JornadaModal · acompletar",
@@ -293,7 +312,11 @@ const casos = [
     />,
     ["Acompletar jornada de", "8h", "Guardar"],
   ],
-  ["EscanearTab", <EscanearTab state={state} actions={actions} />, ["Buscar trabajador"]],
+  [
+    "EscanearTab",
+    <EscanearTab state={state} actions={actions} />,
+    ["Buscar trabajador"],
+  ],
   [
     "ReporteDiarioTab",
     <ReporteDiarioTab state={state} actions={actions} />,
@@ -302,7 +325,12 @@ const casos = [
   [
     "ResumenTab",
     <ResumenTab state={state} actions={actions} />,
-    ["Resumen General", "Resumen Furgonetas", "Ciclo de pago", "Del 01/08 al 15/08"],
+    [
+      "Resumen General",
+      "Resumen Furgonetas",
+      "Ciclo de pago",
+      "Del 01/08 al 15/08",
+    ],
   ],
   [
     "RegistrosTab",
@@ -364,14 +392,22 @@ for (const [nombre, elemento, textos] of casos) {
     // icono desaparecía sin romper nada). Cualquier etiqueta de 1-2 letras que
     // no sea HTML real es ese bug.
     const HTML_CORTAS = new Set(
-      "a b i p q s u br dd dl dt em h1 h2 h3 h4 h5 h6 hr li ol rp rt td th tr ul".split(" "),
+      "a b i p q s u br dd dl dt em h1 h2 h3 h4 h5 h6 hr li ol rp rt td th tr ul".split(
+        " ",
+      ),
     );
     for (const [, etiqueta] of html.matchAll(/<([a-z][a-z0-9]?)[\s/>]/g)) {
-      assert.ok(HTML_CORTAS.has(etiqueta), `etiqueta desconocida <${etiqueta}>`);
+      assert.ok(
+        HTML_CORTAS.has(etiqueta),
+        `etiqueta desconocida <${etiqueta}>`,
+      );
     }
     // Ningún PIN en claro debe llegar nunca a una pantalla de listado.
     if (nombre === "GenerarPinesModal" || nombre === "RegistrosTab") {
-      assert.ok(!/\b\d{4}\b(?![-/])/.test(html.replace(/\d{4}-\d{2}-\d{2}/g, "")), "PIN en claro");
+      assert.ok(
+        !/\b\d{4}\b(?![-/])/.test(html.replace(/\d{4}-\d{2}-\d{2}/g, "")),
+        "PIN en claro",
+      );
     }
     console.log(`ok   ${nombre}`);
   } catch (err) {
@@ -380,5 +416,7 @@ for (const [nombre, elemento, textos] of casos) {
   }
 }
 
-console.log(fallos === 0 ? `\n${casos.length} pantallas OK` : `\n${fallos} fallo(s)`);
+console.log(
+  fallos === 0 ? `\n${casos.length} pantallas OK` : `\n${fallos} fallo(s)`,
+);
 process.exit(fallos === 0 ? 0 : 1);

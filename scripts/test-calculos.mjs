@@ -4,15 +4,51 @@
  */
 import assert from "node:assert/strict";
 
-import { calcEmpleado, calcVehiculo, rosterToList, saldoEmpleado } from "../src/lib/calculos.js";
+import {
+  calcEmpleado,
+  calcVehiculo,
+  importeJornada,
+  rosterToList,
+  saldoEmpleado,
+} from "../src/lib/calculos.js";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { ddmm, eur } from "../src/lib/format.js";
 
 const state = {
   jornadas: [
-    { id: "j1", empleado_id: "t1", horas: 8, tarifa: 9.5, destajo: 0, fue_liquidado: false },
-    { id: "j2", empleado_id: "t1", horas: 4, tarifa: 9.5, destajo: 12, fue_liquidado: false },
-    { id: "j3", empleado_id: "t1", horas: 8, tarifa: 9.5, destajo: 0, fue_liquidado: true },
-    { id: "j4", empleado_id: "t2", horas: 5, tarifa: 8, destajo: 0, fue_liquidado: false },
+    {
+      id: "j1",
+      empleado_id: "t1",
+      horas: 8,
+      tarifa: 9.5,
+      destajo: 0,
+      fue_liquidado: false,
+    },
+    {
+      id: "j2",
+      empleado_id: "t1",
+      horas: 4,
+      tarifa: 9.5,
+      destajo: 12,
+      fue_liquidado: false,
+    },
+    {
+      id: "j3",
+      empleado_id: "t1",
+      horas: 8,
+      tarifa: 9.5,
+      destajo: 0,
+      fue_liquidado: true,
+    },
+    {
+      id: "j4",
+      empleado_id: "t2",
+      horas: 5,
+      tarifa: 8,
+      destajo: 0,
+      fue_liquidado: false,
+    },
   ],
   adelantos: [
     { id: "a1", empleado_id: "t1", monto: 30 },
@@ -23,14 +59,24 @@ const state = {
     { id: "d2", vehiculo_id: "v1", plazas: 5, tarifa_aplicada: 4.5 },
     { id: "d3", vehiculo_id: "v2", plazas: 4, tarifa_aplicada: 5 },
   ],
-  adelantosVehiculo: [{ id: "av1", vehiculo_id: "v1", concepto: "Espejo", monto: 40 }],
+  adelantosVehiculo: [
+    { id: "av1", vehiculo_id: "v1", concepto: "Espejo", monto: 40 },
+  ],
 };
 
 // --- empleados ---------------------------------------------------------------
 const t1 = calcEmpleado(state, "t1");
-assert.equal(t1.jornadas.length, 2, "las jornadas liquidadas no cuentan en el ciclo abierto");
+assert.equal(
+  t1.jornadas.length,
+  2,
+  "las jornadas liquidadas no cuentan en el ciclo abierto",
+);
 assert.equal(t1.totalDevengado, 8 * 9.5 + (4 * 9.5 + 12)); // 76 + 50 = 126
-assert.equal(t1.totalAdelantos, 50, "los adelantos en texto deben sumarse como número");
+assert.equal(
+  t1.totalAdelantos,
+  50,
+  "los adelantos en texto deben sumarse como número",
+);
 assert.equal(t1.totalPagar, 76);
 assert.equal(saldoEmpleado(state, "t1"), 76);
 
@@ -106,16 +152,38 @@ const conCiclo = {
     { id: "a2", empleado_id: "t1", fecha: "2026-03-25", monto: 500 },
   ],
   plazasVehiculo: [
-    { id: "d1", vehiculo_id: "v1", fecha: "2026-03-10", plazas: 4, tarifa_aplicada: 5 },
-    { id: "d2", vehiculo_id: "v1", fecha: "2026-03-20", plazas: 4, tarifa_aplicada: 5 },
+    {
+      id: "d1",
+      vehiculo_id: "v1",
+      fecha: "2026-03-10",
+      plazas: 4,
+      tarifa_aplicada: 5,
+    },
+    {
+      id: "d2",
+      vehiculo_id: "v1",
+      fecha: "2026-03-20",
+      plazas: 4,
+      tarifa_aplicada: 5,
+    },
   ],
-  adelantosVehiculo: [{ id: "av1", vehiculo_id: "v1", fecha: "2026-03-22", monto: 99 }],
+  adelantosVehiculo: [
+    { id: "av1", vehiculo_id: "v1", fecha: "2026-03-22", monto: 99 },
+  ],
 };
 
 const c1 = calcEmpleado(conCiclo, "t1");
-assert.equal(c1.jornadas.length, 2, "la jornada posterior al cierre no se puede cobrar aún");
+assert.equal(
+  c1.jornadas.length,
+  2,
+  "la jornada posterior al cierre no se puede cobrar aún",
+);
 assert.equal(c1.totalDevengado, 160, "arrastre dentro, futuro fuera");
-assert.equal(c1.totalAdelantos, 20, "el adelanto posterior al cierre no se descuenta aún");
+assert.equal(
+  c1.totalAdelantos,
+  20,
+  "el adelanto posterior al cierre no se descuenta aún",
+);
 assert.equal(c1.totalPagar, 140);
 
 assert.equal(
@@ -125,10 +193,17 @@ assert.equal(
 );
 
 const cv = calcVehiculo(conCiclo, "v1");
-assert.equal(cv.totalPagar, 20, "la furgoneta también se corta en el cierre quincenal");
+assert.equal(
+  cv.totalPagar,
+  20,
+  "la furgoneta también se corta en el cierre quincenal",
+);
 
 // Sin períodos cargados no se filtra: la pantalla no debe parpadear a cero.
-assert.equal(calcEmpleado({ ...conCiclo, periodos: {} }, "t1").jornadas.length, 3);
+assert.equal(
+  calcEmpleado({ ...conCiclo, periodos: {} }, "t1").jornadas.length,
+  3,
+);
 
 // --- roster de un parte de campo ---------------------------------------------
 // El encargado que además conduce aparece una sola vez, con los dos códigos.
@@ -160,7 +235,10 @@ assert.deepEqual(
 );
 
 // Sin encargado ni chofer, sólo pasajeros.
-assert.equal(rosterToList({ pasajeros: [{ id: "t9", horas: 5, destajo: 1 }] }).length, 1);
+assert.equal(
+  rosterToList({ pasajeros: [{ id: "t9", horas: 5, destajo: 1 }] }).length,
+  1,
+);
 assert.equal(rosterToList({}).length, 0);
 
 // --- formato -----------------------------------------------------------------
@@ -194,11 +272,124 @@ abrirPlanilla({
   total: 70,
 });
 
-assert.ok(descargado.includes("&lt;Ana&gt; &amp; Luis"), "los nombres se escapan");
+assert.ok(
+  descargado.includes("&lt;Ana&gt; &amp; Luis"),
+  "los nombres se escapan",
+);
 assert.ok(!descargado.includes("<Ana>"), "no se cuela HTML del nombre");
-assert.equal((descargado.match(/<th[ >]/g) || []).length, 5, "una cabecera por columna");
-assert.equal((descargado.match(/<td[ >]/g) || []).length, 5 + 3, "fila + total");
+assert.equal(
+  (descargado.match(/<th[ >]/g) || []).length,
+  5,
+  "una cabecera por columna",
+);
+assert.equal(
+  (descargado.match(/<td[ >]/g) || []).length,
+  5 + 3,
+  "fila + total",
+);
 assert.ok(descargado.includes("€70.00"), "el total sale en la planilla");
-assert.ok(descargado.includes("window.print()"), "el documento se manda a imprimir solo");
+assert.ok(
+  descargado.includes("window.print()"),
+  "el documento se manda a imprimir solo",
+);
+
+// --- la fórmula del importe está escrita dos veces ---------------------------
+//
+// `importeJornada()` aquí y `v_jornadas_detalle.total` en SQL (migración 0019).
+// Si una cambia y la otra no, la pantalla enseña un número y el pago hace otro,
+// y nadie se entera hasta que alguien cobra de menos. Esta prueba compara las
+// dos: la de JavaScript ejecutándola, la de SQL leyendo la migración y
+// traduciéndola a la misma cuenta.
+{
+  const casos = [
+    {
+      horas: 8,
+      tarifa: 9.5,
+      destajo: 0,
+      horas_central: 0,
+      destajo_central: 0,
+      plus_chofer: 0,
+    },
+    {
+      horas: 8,
+      tarifa: 6,
+      destajo: 0,
+      horas_central: 0,
+      destajo_central: 0,
+      plus_chofer: 6,
+    },
+    {
+      horas: 8,
+      tarifa: 12,
+      destajo: 0,
+      horas_central: 2,
+      destajo_central: 5,
+      plus_chofer: 0,
+    },
+    {
+      horas: 0,
+      tarifa: 7,
+      destajo: 40,
+      horas_central: 0,
+      destajo_central: 0,
+      plus_chofer: 0,
+    },
+    {
+      horas: 5,
+      tarifa: 6.5,
+      destajo: 3,
+      horas_central: 1.5,
+      destajo_central: 2,
+      plus_chofer: 6,
+    },
+  ];
+
+  // La cuenta tal como la escribe la vista, calcada a mano.
+  const comoEnSql = (j) =>
+    Math.round(
+      ((j.horas + j.horas_central) * j.tarifa +
+        j.destajo +
+        j.destajo_central +
+        j.plus_chofer) *
+        100,
+    ) / 100;
+
+  for (const j of casos) {
+    assert.equal(
+      importeJornada(j),
+      comoEnSql(j),
+      `la fórmula de JS y la de SQL discrepan en ${JSON.stringify(j)}`,
+    );
+  }
+
+  // Y que la migración siga sumando esos cinco términos: si alguien le quita
+  // uno, aquí salta antes de que llegue a producción.
+  // Ruta a pelo y no `new URL(...)`: unas líneas más arriba esta misma prueba
+  // sustituye `globalThis.URL` por un doble para el test de la descarga.
+  const sql = readFileSync(
+    join(
+      import.meta.dirname,
+      "../../BACKEND/supabase/migrations/0019_horas_central_plus_chofer.sql",
+    ),
+    "utf8",
+  );
+  const vista = sql.slice(
+    sql.indexOf("create or replace view v_jornadas_detalle"),
+  );
+  const total = vista.slice(vista.indexOf("round("), vista.indexOf("as total"));
+  for (const termino of [
+    "j.horas",
+    "j.horas_central",
+    "j.tarifa_hora",
+    "j.destajo",
+    "j.destajo_central",
+    "j.plus_chofer",
+  ]) {
+    assert.ok(
+      total.includes(termino),
+      `v_jornadas_detalle.total ya no suma ${termino}`,
+    );
+  }
+}
 
 console.log("cálculos OK");

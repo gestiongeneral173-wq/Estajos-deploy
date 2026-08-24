@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ArrowLeft, CircleUser, Clock, Search, Wallet } from "lucide-react";
 import { CodeBadge } from "../../components/ui/Badges.jsx";
 import {
@@ -9,7 +9,7 @@ import {
   SectionTitle,
 } from "../../components/ui/primitives.jsx";
 import { calcEmpleado } from "../../lib/calculos.js";
-import { eur, hoy } from "../../lib/format.js";
+import { diaSemana, eur, hoy } from "../../lib/format.js";
 import { colors, hexToRgba } from "../../theme.js";
 
 export function EscanearTab({ state, actions }) {
@@ -434,62 +434,217 @@ export function LiquidacionView({
 
 export function AgregarHorasView({ trabajadorId, actions, onBack }) {
   const HOY = hoy();
-  const [horas, setHoras] = useState(""),
+  const [fecha, setFecha] = useState(HOY),
+    // Qué tiene ya esa persona ese día. Se pregunta ANTES de que el admin
+    // rellene nada: no tiene sentido dejarle escribir algo que va a rebotar.
+    [estado, setEstado] = useState({ cargando: true }),
+    [horas, setHoras] = useState(""),
     [destajo, setDestajo] = useState(""),
-    // Las horas no siempre se apuntan el día que se trabajaron. La base ya
-    // recibía la fecha (`registrar_horas_central`); lo que faltaba era
-    // preguntarla en vez de dar hoy por hecho.
-    [fecha, setFecha] = useState(HOY);
+    [error, setError] = useState(null),
+    [confirmando, setConfirmando] = useState(false),
+    [guardando, setGuardando] = useState(false);
+
+  // `actions` se recrea en cada render, así que fuera de las dependencias: lo
+  // que dispara la consulta es cambiar de persona o de día.
+  useEffect(() => {
+    let vivo = true;
+    setEstado({ cargando: true });
+    setError(null);
+    setConfirmando(false);
+    setHoras("");
+    setDestajo("");
+    actions
+      .estadoJornada(trabajadorId, fecha)
+      .then((jornada) => vivo && setEstado({ cargando: false, jornada }))
+      .catch((e) => {
+        if (!vivo) return;
+        setEstado({ cargando: false, jornada: null });
+        setError(e.message);
+      });
+    return () => {
+      vivo = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trabajadorId, fecha]);
+
+  const jornada = estado.jornada,
+    esPasada = fecha !== HOY,
+    dia = diaSemana(fecha),
+    hayAlgo = (parseFloat(horas) || 0) > 0 || (parseFloat(destajo) || 0) > 0,
+    negativo = parseFloat(horas) < 0 || parseFloat(destajo) < 0,
+    puedeGuardar = hayAlgo && !negativo && !guardando && !estado.cargando;
+
+  const guardar = async () => {
+    // En un día pasado nadie confirmó en campo que esa persona estuviera ahí:
+    // la única verificación es el criterio del admin, así que se le pide dos
+    // veces a propósito.
+    if (esPasada && !confirmando) {
+      setConfirmando(true);
+      return;
+    }
+    setError(null);
+    setGuardando(true);
+    try {
+      await actions.registrarHorasCentral(
+        trabajadorId,
+        parseFloat(horas) || 0,
+        parseFloat(destajo) || 0,
+        fecha,
+      );
+      onBack();
+    } catch (e) {
+      setError(e.message);
+      setConfirmando(false);
+    } finally {
+      setGuardando(false);
+    }
+  };
+
+  const selectorFecha = (
+    <Input
+      label="Día trabajado"
+      type="date"
+      value={fecha}
+      max={HOY}
+      onChange={(i) => setFecha(i.target.value || HOY)}
+      hint={
+        dia ? `${dia.letra} · ${esPasada ? "día pasado" : "hoy"}` : undefined
+      }
+    />
+  );
+
+  const aviso = (texto, tono) => (
+    <p
+      className="text-[12px] rounded-lg px-3 py-2"
+      style={{ color: tono, background: hexToRgba(tono, 0.09) }}
+    >
+      {texto}
+    </p>
+  );
+
+  if (estado.cargando) {
+    return (
+      <Card>
+        <SectionTitle color="gold">Agregar horas</SectionTitle>
+        <div className="space-y-4">
+          {selectorFecha}
+          <p className="text-[13px]" style={{ color: colors.muted }}>
+            Comprobando qué tiene ese día…
+          </p>
+          <Button variant="outline" onClick={onBack}>
+            Cancelar
+          </Button>
+        </div>
+      </Card>
+    );
+  }
+
+  // Pagada: no se toca nada. Corregir un pago es anularlo, no editarlo.
+  if (jornada?.liquidada) {
+    return (
+      <Card>
+        <SectionTitle color="gold">Agregar horas</SectionTitle>
+        <div className="space-y-4">
+          {selectorFecha}
+          <ResumenJornada jornada={jornada} />
+          {aviso(
+            "Esa jornada ya está pagada. No se le puede añadir nada ni corregirla desde aquí.",
+            colors.danger,
+          )}
+          <Button variant="outline" onClick={onBack}>
+            Volver
+          </Button>
+        </div>
+      </Card>
+    );
+  }
+
   return (
     <Card>
       <SectionTitle color="gold">
-        {fecha === HOY ? "Agregar horas · Hoy" : "Agregar horas"}
+        {jornada ? "Añadir a la jornada" : "Agregar horas"}
       </SectionTitle>
       <div className="space-y-4">
+        {selectorFecha}
+
+        {jornada && <ResumenJornada jornada={jornada} />}
+
+        {esPasada &&
+          aviso(
+            "Día pasado: nadie confirmó en campo que esa persona estuviera ahí. Queda a tu criterio.",
+            colors.primary,
+          )}
+
         <Input
-          label="Día trabajado"
-          type="date"
-          value={fecha}
-          max={HOY}
-          onChange={(i) => setFecha(i.target.value || HOY)}
-          hint={
-            fecha === HOY
-              ? undefined
-              : "Se apuntará en esa fecha, no en la de hoy."
-          }
-        />
-        <Input
-          label="Horas trabajadas"
+          label={jornada ? "Horas a añadir" : "Horas trabajadas"}
           type="number"
+          min="0"
+          max="24"
+          inputMode="decimal"
           value={horas}
           onChange={(i) => setHoras(i.target.value)}
         />
         <Input
-          label="Destajo (€)"
+          label={jornada ? "Destajo a añadir (€)" : "Destajo (€)"}
           type="number"
+          min="0"
+          inputMode="decimal"
           value={destajo}
           onChange={(i) => setDestajo(i.target.value)}
         />
+
+        {negativo &&
+          aviso(
+            "Ni las horas ni el destajo pueden ser negativos.",
+            colors.danger,
+          )}
+        {error && aviso(error, colors.danger)}
+
         <div className="grid grid-cols-2 gap-3">
-          <Button variant="outline" onClick={onBack}>
-            Cancelar
+          <Button
+            variant="outline"
+            onClick={() => (confirmando ? setConfirmando(false) : onBack())}
+          >
+            {confirmando ? "Volver atrás" : "Cancelar"}
           </Button>
           <Button
-            variant="primary"
-            onClick={() => {
-              actions.registrarHorasCentral(
-                trabajadorId,
-                parseFloat(horas) || 0,
-                parseFloat(destajo) || 0,
-                fecha,
-              );
-              onBack();
-            }}
+            variant={confirmando ? "danger" : "primary"}
+            disabled={!puedeGuardar}
+            onClick={guardar}
           >
-            Registrar
+            {confirmando ? "¿Confirmar?" : jornada ? "Añadir" : "Registrar"}
           </Button>
         </div>
       </div>
     </Card>
+  );
+}
+
+/** Lo que esa persona ya tiene ese día, para decidir con la cifra delante. */
+function ResumenJornada({ jornada }) {
+  const horas = Number(jornada.horas) + Number(jornada.horas_central || 0),
+    destajo = Number(jornada.destajo) + Number(jornada.destajo_central || 0);
+  return (
+    <div
+      className="rounded-lg px-3 py-2.5"
+      style={{ background: "#F5F6F4", border: `1px solid ${colors.line}` }}
+    >
+      <p className="eyebrow" style={{ color: colors.muted }}>
+        Ya tiene ese día
+      </p>
+      <p
+        className="text-[15px] font-semibold mt-0.5"
+        style={{ color: colors.navyDark }}
+      >
+        <span className="cifra">{horas}</span>
+        {" h · "}
+        <span className="cifra">{eur(destajo)}</span>
+      </p>
+      <p className="text-[11px] mt-0.5" style={{ color: colors.muted }}>
+        {jornada.vehiculo
+          ? `Fichada en ${jornada.vehiculo}`
+          : "Apuntada desde Central"}
+      </p>
+    </div>
   );
 }

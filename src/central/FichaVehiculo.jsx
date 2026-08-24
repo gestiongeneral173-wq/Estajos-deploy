@@ -177,6 +177,7 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
             <Input
               label="Plazas totales"
               type="number"
+              min="0"
               value={form.plazas_totales}
               onChange={(j) =>
                 setForm({
@@ -260,6 +261,7 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
                 {plazasEditando === dia.id ? (
                   <input
                     type="number"
+                    min="0"
                     autoFocus={true}
                     value={valorPlazas}
                     onChange={(F) => setValorPlazas(F.target.value)}
@@ -343,6 +345,7 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
           <Input
             label="Monto (€)"
             type="number"
+            min="0"
             value={nuevoAdelanto.monto}
             onChange={(j) =>
               setNuevoAdelanto({
@@ -410,6 +413,7 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
                   <div className="flex items-center gap-1">
                     <input
                       type="number"
+                      min="0"
                       autoFocus={true}
                       defaultValue={adelanto.monto}
                       onChange={(F) =>

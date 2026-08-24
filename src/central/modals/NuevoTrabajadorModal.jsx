@@ -72,6 +72,7 @@ export function NuevoTrabajadorModal({ open, onClose, actions }) {
         <Input
           label="Pago por hora (€) *"
           type="number"
+          min="0"
           value={form.tarifa_hora}
           onChange={campo("tarifa_hora")}
         />

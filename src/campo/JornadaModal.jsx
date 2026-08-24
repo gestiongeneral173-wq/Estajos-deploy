@@ -173,6 +173,7 @@ export function JornadaModal({
             <Input
               label="Horas"
               type="number"
+              min="0"
               inputMode="decimal"
               value={horas}
               onChange={(u) => setHoras(u.target.value)}
@@ -186,6 +187,7 @@ export function JornadaModal({
             <Input
               label="Destajo €"
               type="number"
+              min="0"
               inputMode="decimal"
               value={destajo}
               onChange={(u) => setDestajo(u.target.value)}

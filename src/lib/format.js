@@ -37,3 +37,16 @@ export function eur(n) {
 // temporales del asistente). Los ids de verdad los genera la base.
 let secuencia = 0;
 export const idLocal = () => `tmp-${++secuencia}`;
+
+/**
+ * La inicial del día de la semana de una fecha ISO, con las abreviaturas que
+ * usa la casa: miércoles es "MI" de dos letras para no confundirlo con martes.
+ *
+ *   "2026-08-17" -> { letra: "L", finde: false }
+ */
+const LETRAS_DIA = ["D", "L", "M", "MI", "J", "V", "S"];
+export function diaSemana(fecha) {
+  if (!fecha) return null;
+  const dia = new Date(fecha + "T00:00:00").getDay();
+  return { letra: LETRAS_DIA[dia], finde: dia === 0 || dia === 6 };
+}

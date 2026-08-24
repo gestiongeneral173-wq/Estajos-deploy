@@ -291,6 +291,7 @@ export function ReporteDiarioTab({ state, actions }) {
                         {A ? (
                           <input
                             type="number"
+                            min="0"
                             autoFocus={true}
                             value={borrador.horas}
                             onChange={(H) =>
@@ -314,6 +315,7 @@ export function ReporteDiarioTab({ state, actions }) {
                         {A ? (
                           <input
                             type="number"
+                            min="0"
                             value={borrador.destajo}
                             onChange={(H) =>
                               setBorrador({

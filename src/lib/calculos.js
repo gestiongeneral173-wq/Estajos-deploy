@@ -61,6 +61,26 @@ const hastaElCierre = (cierre) => (fecha) =>
   !cierre || !fecha || fecha <= cierre;
 
 /** Ciclo abierto de un empleado: lo devengado sin liquidar menos sus adelantos. */
+/**
+ * Lo que vale un día de trabajo. GEMELA de `v_jornadas_detalle.total` en SQL
+ * (migración 0019) — si una cambia, la otra también, o la pantalla dirá un
+ * número y el pago otro. `scripts/test-calculos.mjs` compara las dos.
+ *
+ *   (horas fichadas + horas que añadió Central) × tarifa
+ *   + destajo + destajo de Central
+ *   + plus por conducir
+ */
+export function importeJornada(j) {
+  const horas = Number(j.horas || 0) + Number(j.horas_central || 0);
+  const destajo = Number(j.destajo || 0) + Number(j.destajo_central || 0);
+  return (
+    Math.round(
+      (horas * Number(j.tarifa || 0) + destajo + Number(j.plus_chofer || 0)) *
+        100,
+    ) / 100
+  );
+}
+
 export function calcEmpleado(state, empleadoId) {
   const trabajador = state.trabajadores?.find((t) => t.id === empleadoId);
   const dentro = hastaElCierre(
@@ -73,7 +93,7 @@ export function calcEmpleado(state, empleadoId) {
     (a) => a.empleado_id === empleadoId && dentro(a.fecha),
   );
   const totalDevengado = jornadas.reduce(
-    (total, j) => total + j.horas * j.tarifa + Number(j.destajo),
+    (total, j) => total + importeJornada(j),
     0,
   );
   const totalAdelantos = adelantos.reduce(

@@ -23,7 +23,7 @@ import {
   Sheet,
 } from "../components/ui/primitives.jsx";
 import { calcEmpleado, saldoEmpleado } from "../lib/calculos.js";
-import { eur, hoy } from "../lib/format.js";
+import { diaSemana, eur, hoy } from "../lib/format.js";
 import { colors, hexToRgba } from "../theme.js";
 
 /**
@@ -482,16 +482,18 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
                   key={jornada.id}
                 >
                   <p
-                    className="text-[11px]"
+                    className="text-[11px] flex items-center gap-1.5"
                     style={{
                       color: colors.navyDark,
                     }}
                   >
+                    <DiaSemana fecha={jornada.fecha} />
                     {jornada.fecha}
                   </p>
                   {XVar ? (
                     <input
                       type="number"
+                      min="0"
                       autoFocus={true}
                       value={borradorJornada.horas}
                       onChange={(A) =>
@@ -510,11 +512,13 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
                       }}
                     >
                       {jornada.horas}
+                      <Anadido valor={jornada.horas_central} />
                     </p>
                   )}
                   {XVar ? (
                     <input
                       type="number"
+                      min="0"
                       value={borradorJornada.destajo}
                       onChange={(A) =>
                         setBorradorJornada({
@@ -532,6 +536,7 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
                       }}
                     >
                       {eur(jornada.destajo)}
+                      <Anadido valor={jornada.destajo_central} />
                     </p>
                   )}
                   <p className="text-[11px] text-center text-gray-500">
@@ -593,6 +598,7 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
         <div className="flex gap-2">
           <Input
             type="number"
+            min="0"
             placeholder="Monto (€)"
             value={montoAdelanto}
             onChange={(T) => setMontoAdelanto(T.target.value)}
@@ -655,6 +661,7 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
                   <div className="flex items-center gap-1">
                     <input
                       type="number"
+                      min="0"
                       autoFocus={true}
                       value={valorAdelanto}
                       onChange={(XVar) => setValorAdelanto(XVar.target.value)}
@@ -807,9 +814,18 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
                             }}
                             key={XVar.id}
                           >
-                            <span>{XVar.fecha}</span>
-                            <span className="text-center">{XVar.horas}</span>
-                            <span className="text-center">€{XVar.destajo}</span>
+                            <span className="flex items-center gap-1.5">
+                              <DiaSemana fecha={XVar.fecha} />
+                              {XVar.fecha}
+                            </span>
+                            <span className="text-center">
+                              {XVar.horas}
+                              <Anadido valor={XVar.horas_central} />
+                            </span>
+                            <span className="text-center">
+                              €{XVar.destajo}
+                              <Anadido valor={XVar.destajo_central} />
+                            </span>
                             <span className="text-center text-gray-500">
                               €{XVar.tarifa}/h
                             </span>
@@ -953,5 +969,30 @@ export function FichaTrabajador({ id, state, actions, onBack }) {
         </div>
       </Sheet>
     </div>
+  );
+}
+
+/** La inicial del día de la semana, junto a la fecha. Fin de semana en cálido. */
+function DiaSemana({ fecha }) {
+  const dia = diaSemana(fecha);
+  if (!dia) return null;
+  return (
+    <span
+      className="eyebrow shrink-0 w-4 text-center"
+      style={{ color: dia.finde ? colors.danger : colors.muted }}
+      title={fecha}
+    >
+      {dia.letra}
+    </span>
+  );
+}
+
+/** El "+2" de lo que añadió Central, pegado a la cifra que fichó campo. */
+function Anadido({ valor }) {
+  if (!Number(valor)) return null;
+  return (
+    <span style={{ color: colors.primary }} title="Añadido desde Central">
+      +{Number(valor)}
+    </span>
   );
 }

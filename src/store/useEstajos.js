@@ -128,7 +128,7 @@ export function useEstajos() {
         supabase
           .from("v_jornadas_detalle")
           .select(
-            "id, trabajador_id, fecha, horas, destajo, tarifa_hora, rol, origen, encargado_id, registrado_por, vehiculo_id, pago_id, parte_id",
+            "id, trabajador_id, fecha, horas, destajo, horas_central, destajo_central, plus_chofer, tarifa_hora, rol, origen, encargado_id, registrado_por, vehiculo_id, pago_id, parte_id",
           )
           .order("fecha", { ascending: false })
           .then(ok),
@@ -191,6 +191,10 @@ export function useEstajos() {
         fecha: j.fecha,
         horas: Number(j.horas),
         destajo: Number(j.destajo),
+        // Lo que Central añadió encima, aparte para poder enseñarlo como "10+2".
+        horas_central: Number(j.horas_central || 0),
+        destajo_central: Number(j.destajo_central || 0),
+        plus_chofer: Number(j.plus_chofer || 0),
         tarifa: Number(j.tarifa_hora),
         fue_liquidado: j.pago_id !== null,
         origen: j.origen,
@@ -466,8 +470,16 @@ export function useEstajos() {
             .then(ok),
         ),
 
-      eliminarJornadas: (ids) =>
-        mutar(() => supabase.from("jornadas").delete().in("id", ids).then(ok)),
+      // Ya no borra contra la tabla: la función decide si borrar u ocultar
+      // (según esté pagada) y recuenta las plazas de la furgoneta afectada.
+      eliminarJornadas: (ids) => rpc("borrar_jornadas", { p_ids: ids }),
+
+      // Qué tiene esa persona ese día, antes de que el admin rellene nada.
+      estadoJornada: (empleadoId, fecha) =>
+        supabase
+          .rpc("estado_jornada", { p_trabajador: empleadoId, p_fecha: fecha })
+          .then(ok)
+          .then((filas) => filas?.[0] ?? null),
 
       // ---- Liquidaciones -----------------------------------------------------
       pagarEmpleado: (id) => rpc("liquidar_trabajador", { p_trabajador: id }),

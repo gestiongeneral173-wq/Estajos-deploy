@@ -48,6 +48,7 @@ export function NuevoVehiculoModal({ open, onClose, onSave }) {
         <Input
           label="Plazas totales"
           type="number"
+          min="0"
           value={form.plazas_totales}
           onChange={campo("plazas_totales")}
         />

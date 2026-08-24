@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Settings, Trash2 } from "lucide-react";
 import { Button, Input, Sheet } from "../../components/ui/primitives.jsx";
+import { diaSemana, eur, hoy } from "../../lib/format.js";
 import { colors } from "../../theme.js";
 
 export function TemporalesModal({ open, onClose, state, actions }) {
@@ -11,6 +12,24 @@ export function TemporalesModal({ open, onClose, state, actions }) {
     [editando, setEditando] = useState(false),
     [valor, setValor] = useState(String(tarifaTemporal)),
     [guardado, setGuardado] = useState(false),
+    // Desde 0019 los temporales ya no se borran cada noche: se acumulan hasta
+    // que la purga de 60 días se los lleva. Sin filtro, en un mes esto es
+    // ilegible.
+    [dia, setDia] = useState(""),
+    listado = useMemo(
+      () =>
+        (temporales ?? [])
+          .filter((t) => !dia || t.fecha === dia)
+          .sort((a, b) =>
+            String(b.fecha ?? "").localeCompare(String(a.fecha ?? "")),
+          ),
+      [temporales, dia],
+    ),
+    totalHoras = listado.reduce(
+      (n, t) => n + Number(t.horas_trabajadas || 0),
+      0,
+    ),
+    totalDestajo = listado.reduce((n, t) => n + Number(t.destajo || 0), 0),
     valido = parseFloat(valor) > 0,
     guardar = () => {
       actions.setTarifaTemporal(parseFloat(valor) || 0);
@@ -82,19 +101,51 @@ export function TemporalesModal({ open, onClose, state, actions }) {
             >
               <Settings className="w-4 h-4" />
             </button>
+            <div className="grid grid-cols-5 gap-1 pt-2 mt-1 border-t border-gray-200">
+              <p className="eyebrow" style={{ color: colors.muted }}>
+                {dia ? "Ese día" : "Total"}
+              </p>
+              <p className="text-[11px] text-center font-semibold cifra">
+                {totalHoras}h
+              </p>
+              <p className="text-[11px] text-center font-semibold cifra">
+                {eur(totalDestajo)}
+              </p>
+              <p />
+              <p />
+            </div>
           </div>
         )}
       </div>
       <div className="bg-gray-50 rounded-xl p-3">
         <p className="text-[11px] text-gray-500 mb-3">
           El listado es informativo — el encargado anota horas y destajo, el
-          sistema no calcula ningún pago. Los de días anteriores se borran solos
-          cada noche; los de hoy siguen aquí hasta que pase el día o los
-          elimines.
+          sistema no calcula ningún pago. Se conservan hasta que la limpieza de
+          los 60 días se los lleva, o hasta que los elimines aquí.
         </p>
-        {temporales.length === 0 ? (
+        <div className="flex items-end gap-2 mb-3">
+          <div className="flex-1">
+            <Input
+              label="Día"
+              type="date"
+              value={dia}
+              max={hoy()}
+              onChange={(e) => setDia(e.target.value)}
+            />
+          </div>
+          {dia && (
+            <Button
+              variant="outline"
+              className="!w-auto px-3"
+              onClick={() => setDia("")}
+            >
+              Todos
+            </Button>
+          )}
+        </div>
+        {listado.length === 0 ? (
           <p className="text-gray-500 text-xs text-center py-3">
-            Sin temporales registrados hoy.
+            {dia ? "Sin temporales ese día." : "Sin temporales registrados."}
           </p>
         ) : (
           <div className="space-y-1">
@@ -108,19 +159,36 @@ export function TemporalesModal({ open, onClose, state, actions }) {
                 </p>
               ))}
             </div>
-            {temporales.map((temporal) => (
+            {listado.map((temporal) => (
               <div
                 className="grid grid-cols-5 gap-1 py-1.5 border-b border-gray-50 last:border-0 items-center"
                 key={temporal.id}
               >
-                <p
-                  className="text-[11px] font-semibold truncate"
-                  style={{
-                    color: colors.navyDark,
-                  }}
-                >
-                  {temporal.nombre_completo}
-                </p>
+                <div className="min-w-0">
+                  <p
+                    className="text-[11px] font-semibold truncate"
+                    style={{
+                      color: colors.navyDark,
+                    }}
+                  >
+                    {temporal.nombre_completo}
+                  </p>
+                  {temporal.fecha && (
+                    <p className="text-[10px] text-gray-500 flex items-center gap-1">
+                      <span
+                        className="eyebrow"
+                        style={{
+                          color: diaSemana(temporal.fecha)?.finde
+                            ? colors.danger
+                            : colors.muted,
+                        }}
+                      >
+                        {diaSemana(temporal.fecha)?.letra}
+                      </span>
+                      {temporal.fecha}
+                    </p>
+                  )}
+                </div>
                 <p
                   className="text-[11px] text-center"
                   style={{
