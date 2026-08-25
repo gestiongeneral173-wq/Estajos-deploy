@@ -52,6 +52,12 @@ export function useCampo() {
 
       const porFecha = {};
       for (const parte of partes) {
+        // Central puede vaciar un parte borrando todas sus jornadas sin
+        // tocar la fila de `partes` (solo borra de `jornadas`). Sin esto,
+        // ese parte fantasma seguía "ocupando" la furgoneta ese día para
+        // cualquier encargado que no fuera quien lo registró originalmente.
+        if (!parte.jornadas || parte.jornadas.length === 0) continue;
+
         const horasRoles = {};
         for (const j of parte.jornadas ?? []) {
           horasRoles[j.trabajador_id] = {

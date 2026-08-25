@@ -23,14 +23,14 @@ export function JornadaModal({
   onConfirm,
 }) {
   const modo = acompletar ? "acompletar" : "alta";
-  const [horas, setHoras] = useState("8");
+  const [horas, setHoras] = useState("0");
   const [destajo, setDestajo] = useState("0");
   const [esChofer, setEsChofer] = useState(false);
   const [esEncargado, setEsEncargado] = useState(false);
 
   useEffect(() => {
     if (!open) return;
-    setHoras(modo === "acompletar" ? "" : "8");
+    setHoras(modo === "acompletar" ? "" : "0");
     setDestajo(modo === "acompletar" ? "" : "0");
     setEsChofer(false);
     setEsEncargado(false);
@@ -39,11 +39,14 @@ export function JornadaModal({
   if (!open) return null;
   const editaHoras = modo === "alta" || acompletar.horas === 0,
     editaDestajo = modo === "alta" || acompletar.destajo === 0,
-    // En alta siempre hay algo que guardar (8 h por defecto); acompletando hay
-    // que teclear una cifra que valga algo, o no hay nada que mandar.
+    // Hay que teclear una cifra que valga algo (horas o destajo) antes de
+    // poder guardar, tanto al dar de alta como al acompletar.
     puedeGuardar =
-      modo === "alta" ||
-      (editaHoras ? parseFloat(horas) > 0 : parseFloat(destajo) > 0);
+      modo === "alta"
+        ? parseFloat(horas) > 0 || parseFloat(destajo) > 0
+        : editaHoras
+          ? parseFloat(horas) > 0
+          : parseFloat(destajo) > 0;
   return (
     <div
       className="fixed inset-0 z-[95] flex items-end sm:items-center justify-center sm:p-5"
