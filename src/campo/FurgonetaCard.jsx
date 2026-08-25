@@ -5,9 +5,13 @@ import { rosterToList } from "../lib/calculos.js";
 import { colors } from "../theme.js";
 
 export function FurgonetaCard({ furgoneta, roster, personas }) {
+  // El temporal ocupa asiento y suma en los totales igual que cualquiera: la
+  // furgoneta cobra por su plaza. Va en lista aparte porque no tiene ficha.
   const filas = rosterToList(roster),
-    totalHoras = filas.reduce((s, fila) => s + (fila.horas || 0), 0),
-    totalDestajo = filas.reduce((s, fila) => s + (fila.destajo || 0), 0);
+    temporales = roster.temporales ?? [],
+    aBordo = [...filas, ...temporales],
+    totalHoras = aBordo.reduce((s, fila) => s + (fila.horas || 0), 0),
+    totalDestajo = aBordo.reduce((s, fila) => s + (fila.destajo || 0), 0);
   return (
     <Card className="!p-0 overflow-hidden">
       <div className="flex items-baseline gap-2 px-5 pt-4 pb-3">
@@ -25,7 +29,7 @@ export function FurgonetaCard({ furgoneta, roster, personas }) {
             color: colors.muted,
           }}
         >
-          <span className="cifra">{filas.length}</span>/
+          <span className="cifra">{aBordo.length}</span>/
           <span className="cifra">{furgoneta.plazas}</span>
           {" plazas"}
         </span>
@@ -90,6 +94,37 @@ export function FurgonetaCard({ furgoneta, roster, personas }) {
             </div>
           ))}
         </div>
+        {temporales.length > 0 && (
+          <div
+            className="border-t pt-2 pb-1"
+            style={{
+              borderColor: colors.line,
+            }}
+          >
+            <span
+              className="eyebrow"
+              style={{
+                color: "#9DA19C",
+              }}
+            >
+              Temporales
+            </span>
+            {temporales.map((temporal) => (
+              <div className="flex items-center gap-2 py-2.5" key={temporal.id}>
+                <span
+                  className="flex-1 min-w-0 text-sm truncate"
+                  style={{
+                    color: colors.navyDark,
+                  }}
+                >
+                  {temporal.nombre}
+                </span>
+                <Num className="w-9 text-right">{temporal.horas ?? 0}</Num>
+                <Num className="w-12 text-right">€{temporal.destajo ?? 0}</Num>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
       <div
         className="flex items-center gap-2 px-5 py-3 border-t"

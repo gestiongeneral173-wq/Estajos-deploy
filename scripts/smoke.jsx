@@ -147,6 +147,9 @@ const state = {
       nombre_completo: "Eventual Uno",
       horas_trabajadas: 6,
       destajo: 0,
+      // Su tarifa, copiada al crearlo: sin ella el reporte diario enseñaba €0
+      // a quien trabaja a horas.
+      tarifa_hora: 8,
       fecha: HOY,
       vehiculo_id: "v1",
       encargado_id: "t1",
@@ -215,6 +218,10 @@ const registrosCampo = {
         t1: { horas: 8, destajo: 0 },
         t2: { horas: 8, destajo: 0 },
       },
+      // Ocupan plaza y salen en la tarjeta, con horas y destajo como cualquiera.
+      temporales: [
+        { id: "tmp1", nombre: "Eventual Uno", horas: 6, destajo: 0 },
+      ],
     },
   },
 };
@@ -243,7 +250,15 @@ const casos = [
       onLogout={noop}
       onAbrirRegistro={noop}
     />,
-    ["Parte del día", "Registrar furgoneta", "Furgo A"],
+    [
+      "Parte del día",
+      "Registrar furgoneta",
+      "Furgo A",
+      "Temporales",
+      "Eventual Uno",
+      // Dos en nómina más un temporal: la furgoneta cobra tres plazas.
+      ">3</span>/",
+    ],
   ],
   [
     "NuevoRegistroWizard",
@@ -325,7 +340,14 @@ const casos = [
   [
     "ReporteDiarioTab",
     <ReporteDiarioTab state={state} actions={actions} />,
-    ["Reporte Diario", "Registro Central", "Furgo A"],
+    [
+      "Reporte Diario",
+      "Registro Central",
+      "Furgo A",
+      "Total",
+      // El temporal a 6h por €8: lo que hay que darle, no €0.00.
+      "€48.00",
+    ],
   ],
   [
     "ResumenTab",

@@ -16,6 +16,7 @@ import {
 import { CodeBadge } from "../components/ui/Badges.jsx";
 import {
   Accordion,
+  Anadido,
   Button,
   Card,
   Input,
@@ -983,16 +984,6 @@ function DiaSemana({ fecha }) {
       title={fecha}
     >
       {dia.letra}
-    </span>
-  );
-}
-
-/** El "+2" de lo que añadió Central, pegado a la cifra que fichó campo. */
-function Anadido({ valor }) {
-  if (!Number(valor)) return null;
-  return (
-    <span style={{ color: colors.primary }} title="Añadido desde Central">
-      +{Number(valor)}
     </span>
   );
 }

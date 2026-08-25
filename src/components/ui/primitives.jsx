@@ -21,6 +21,16 @@ export function Num({ children, tone = "default", className = "" }) {
   );
 }
 
+/** El "+2" de lo que añadió Central, pegado a la cifra que fichó campo. */
+export function Anadido({ valor }) {
+  if (!Number(valor)) return null;
+  return (
+    <span style={{ color: colors.primary }} title="Añadido desde Central">
+      +{Number(valor)}
+    </span>
+  );
+}
+
 export function StatusDot({ tone = "ok", className = "" }) {
   const color =
     tone === "ok"

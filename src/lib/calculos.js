@@ -81,6 +81,22 @@ export function importeJornada(j) {
   );
 }
 
+/**
+ * Lo que cobra un temporal por un día: sus horas a SU tarifa (la que se le
+ * copió al crearlo, no la de configuración) más su destajo. No hay gemela en
+ * SQL: la base no le paga al temporal, sólo le cobra el asiento a la
+ * furgoneta. Este número es lo que Central enseña para saber qué darle.
+ */
+export function importeTemporal(t) {
+  return (
+    Math.round(
+      (Number(t.horas_trabajadas || 0) * Number(t.tarifa_hora || 0) +
+        Number(t.destajo || 0)) *
+        100,
+    ) / 100
+  );
+}
+
 export function calcEmpleado(state, empleadoId) {
   const trabajador = state.trabajadores?.find((t) => t.id === empleadoId);
   const dentro = hastaElCierre(

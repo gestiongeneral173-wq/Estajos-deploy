@@ -42,7 +42,7 @@ export function useCampo() {
         supabase
           .from("partes")
           .select(
-            "id, fecha, vehiculo_id, encargado_id, registrado_por, chofer_id, jornadas(trabajador_id, horas, destajo, rol)",
+            "id, fecha, vehiculo_id, encargado_id, registrado_por, chofer_id, jornadas(trabajador_id, horas, destajo, rol), temporales(id, nombre, horas, destajo)",
           )
           .not("vehiculo_id", "is", null)
           .order("fecha", { ascending: false })
@@ -86,6 +86,15 @@ export function useCampo() {
           chofer: parte.chofer_id,
           pasajeros,
           horasRoles,
+          // Van aparte de `pasajeros`: no tienen ficha, así que no pasan por
+          // `rosterToList` ni por el asistente. Sin tarifa — Campo no ve
+          // dinero de tarifas, solo lo que apuntó el encargado.
+          temporales: (parte.temporales ?? []).map((t) => ({
+            id: t.id,
+            nombre: t.nombre,
+            horas: Number(t.horas),
+            destajo: Number(t.destajo),
+          })),
         };
       }
 

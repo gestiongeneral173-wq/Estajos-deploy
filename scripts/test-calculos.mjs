@@ -8,6 +8,7 @@ import {
   calcEmpleado,
   calcVehiculo,
   importeJornada,
+  importeTemporal,
   rosterToList,
   saldoEmpleado,
 } from "../src/lib/calculos.js";
@@ -390,6 +391,48 @@ assert.ok(
       `v_jornadas_detalle.total ya no suma ${termino}`,
     );
   }
+}
+
+// --- el temporal: a él se le paga su día, la plaza la cobra la furgoneta -----
+assert.equal(
+  importeTemporal({ horas_trabajadas: 8, tarifa_hora: 8, destajo: 0 }),
+  64,
+  "el temporal a horas cobra sus horas, no €0",
+);
+assert.equal(
+  importeTemporal({ horas_trabajadas: 0, tarifa_hora: 8, destajo: 50 }),
+  50,
+);
+assert.equal(
+  importeTemporal({ horas_trabajadas: 7.5, tarifa_hora: 8.35, destajo: 12 }),
+  74.63,
+  "los céntimos se redondean, no se arrastran",
+);
+assert.equal(importeTemporal({}), 0);
+
+// Y en la base, que el asiento del temporal siga contando en las tres cuentas
+// de plazas: al enviar el parte, al borrar jornadas y al tocar un temporal.
+{
+  const sql = readFileSync(
+    join(
+      import.meta.dirname,
+      "../../BACKEND/supabase/migrations/0022_temporales_ocupan_plaza.sql",
+    ),
+    "utf8",
+  );
+  const desdeElInsert = sql.slice(sql.indexOf("insert into plazas_vehiculo"));
+  assert.ok(
+    desdeElInsert.slice(0, 200).includes("v_ocupadas"),
+    "enviar_parte volvió a facturar sólo las jornadas",
+  );
+  assert.ok(
+    sql.includes("set plazas = r.quedan + r.quedan_temp"),
+    "borrar_jornadas dejó de contar a los temporales del parte",
+  );
+  assert.ok(
+    sql.includes("after insert or delete on temporales"),
+    "sin trigger, borrar un temporal deja a la furgoneta cobrando su plaza",
+  );
 }
 
 console.log("cálculos OK");

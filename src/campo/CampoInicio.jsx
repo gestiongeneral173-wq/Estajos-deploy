@@ -20,8 +20,13 @@ export function CampoInicio({
     delDia = registrosCampo[fecha] || {},
     cerradas = vehiculos.filter((vehiculo) => delDia[vehiculo.id]),
     pendientes = vehiculos.filter((vehiculo) => !delDia[vehiculo.id]),
+    // Los temporales cuentan como personas a bordo: ocupan plaza y la
+    // furgoneta cobra por ellos.
     totalPersonas = cerradas.reduce(
-      (i, cerrada) => i + rosterToList(delDia[cerrada.id]).length,
+      (i, cerrada) =>
+        i +
+        rosterToList(delDia[cerrada.id]).length +
+        (delDia[cerrada.id].temporales?.length ?? 0),
       0,
     );
   return (

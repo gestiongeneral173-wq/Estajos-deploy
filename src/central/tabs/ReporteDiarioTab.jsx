@@ -2,14 +2,30 @@ import { useEffect, useMemo, useState } from "react";
 import { Check, Pen, Trash2, X } from "lucide-react";
 import { CodeBadge } from "../../components/ui/Badges.jsx";
 import {
+  Anadido,
   Button,
   Card,
   Input,
   SectionTitle,
   Sheet,
 } from "../../components/ui/primitives.jsx";
-import { hoy } from "../../lib/format.js";
+import { importeJornada, importeTemporal } from "../../lib/calculos.js";
+import { eur, hoy } from "../../lib/format.js";
 import { colors } from "../../theme.js";
+
+// Las cinco columnas de la tabla del día. Los temporales usan la misma rejilla
+// para que caigan debajo de las mismas cifras que los empleados.
+const COLUMNAS = "grid grid-cols-[1fr_2.5rem_3.5rem_4rem_1.75rem] gap-2";
+
+/** De dónde sale el total de una jornada, para el tooltip de la columna. */
+const desglose = (j) => {
+  const horas = Number(j.horas || 0) + Number(j.horas_central || 0),
+    destajo = Number(j.destajo || 0) + Number(j.destajo_central || 0),
+    partes = [`${horas}h × ${eur(j.tarifa)}`];
+  if (destajo) partes.push(`destajo ${eur(destajo)}`);
+  if (Number(j.plus_chofer)) partes.push(`plus chofer ${eur(j.plus_chofer)}`);
+  return partes.join(" + ");
+};
 
 export function ReporteDiarioTab({ state, actions }) {
   const {
@@ -218,7 +234,7 @@ export function ReporteDiarioTab({ state, actions }) {
                 </div>
                 <div className="px-5 pt-3 pb-1 space-y-2">
                   <div
-                    className="grid grid-cols-[1fr_3rem_4rem_2rem] gap-3 items-center pb-1 border-b eyebrow"
+                    className={`${COLUMNAS} items-center pb-1 border-b eyebrow`}
                     style={{
                       borderColor: colors.line,
                       color: colors.muted,
@@ -229,6 +245,9 @@ export function ReporteDiarioTab({ state, actions }) {
                     <span className="text-right border-l border-gray-300 pl-2">
                       Destajo
                     </span>
+                    <span className="text-right border-l border-gray-300 pl-2">
+                      Total
+                    </span>
                     <span />
                   </div>
                   {grupo.empleados.map((XVar) => {
@@ -238,7 +257,7 @@ export function ReporteDiarioTab({ state, actions }) {
                       A = editando === XVar.id;
                     return (
                       <div
-                        className="grid grid-cols-[1fr_3rem_4rem_2rem] gap-3 items-center border-b border-gray-100 py-1.5 text-sm"
+                        className={`${COLUMNAS} items-center border-b border-gray-100 py-1.5 text-sm`}
                         key={XVar.id}
                       >
                         <span className="min-w-0 flex items-center gap-2">
@@ -309,7 +328,8 @@ export function ReporteDiarioTab({ state, actions }) {
                               color: XVar.fue_liquidado ? "#9DA19C" : "#565A57",
                             }}
                           >
-                            {XVar.horas}h
+                            {XVar.horas}
+                            <Anadido valor={XVar.horas_central} />h
                           </span>
                         )}
                         {A ? (
@@ -333,8 +353,24 @@ export function ReporteDiarioTab({ state, actions }) {
                             }}
                           >
                             €{XVar.destajo}
+                            <Anadido valor={XVar.destajo_central} />
                           </span>
                         )}
+                        {/* Congelado con lo guardado mientras se edita: se
+                            refresca al confirmar, no mientras se teclea. El
+                            plus de chofer no es ni hora ni destajo, así que
+                            sin el desglose el total parecería descuadrado. */}
+                        <span
+                          className="text-right text-xs font-semibold border-l border-gray-300 pl-2"
+                          title={desglose(XVar)}
+                          style={{
+                            color: XVar.fue_liquidado
+                              ? "#9DA19C"
+                              : colors.navyDark,
+                          }}
+                        >
+                          {eur(importeJornada(XVar))}
+                        </span>
                         {XVar.fue_liquidado ? (
                           <span
                             className="flex justify-end"
@@ -418,7 +454,7 @@ export function ReporteDiarioTab({ state, actions }) {
                         )
                         .map((z) => (
                           <div
-                            className="flex items-center justify-between gap-2 text-sm py-1"
+                            className={`${COLUMNAS} items-center text-sm py-1`}
                             key={z.id}
                           >
                             <span className="flex items-center gap-1.5 min-w-0">
@@ -440,14 +476,34 @@ export function ReporteDiarioTab({ state, actions }) {
                                 Temporal
                               </span>
                             </span>
+                            {/* Lo que está en cero no se apunta: un temporal
+                                a destajo no trae horas, y al revés. */}
                             <span
-                              className="text-xs flex-shrink-0"
-                              style={{
-                                color: colors.muted,
-                              }}
+                              className="text-right text-xs"
+                              style={{ color: "#565A57" }}
                             >
-                              €{Number(z.destajo).toFixed(2)}
+                              {Number(z.horas_trabajadas)
+                                ? `${z.horas_trabajadas}h`
+                                : ""}
                             </span>
+                            <span
+                              className="text-right text-xs border-l border-gray-300 pl-2"
+                              style={{ color: "#565A57" }}
+                            >
+                              {Number(z.destajo) ? `€${z.destajo}` : ""}
+                            </span>
+                            <span
+                              className="text-right text-xs font-semibold border-l border-gray-300 pl-2"
+                              title={`${z.horas_trabajadas}h × ${eur(z.tarifa_hora)}${
+                                Number(z.destajo)
+                                  ? ` + destajo ${eur(z.destajo)}`
+                                  : ""
+                              }`}
+                              style={{ color: colors.navyDark }}
+                            >
+                              {eur(importeTemporal(z))}
+                            </span>
+                            <span />
                           </div>
                         ))}
                     </div>
