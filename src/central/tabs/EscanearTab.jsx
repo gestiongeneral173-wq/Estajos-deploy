@@ -357,7 +357,15 @@ export function LiquidacionView({
   return (
     <Card>
       <SectionTitle color="green">Liquidación · Ciclo activo</SectionTitle>
-      <div className="border border-gray-200 rounded-xl overflow-hidden">
+      <div className="relative border border-gray-200 rounded-xl overflow-hidden">
+        {esPagado && (
+          <span
+            className="absolute inset-0 flex items-center justify-center text-4xl sm:text-5xl font-extrabold uppercase tracking-wider text-green-600/20 -rotate-[20deg] pointer-events-none select-none z-10"
+            aria-hidden="true"
+          >
+            Pagado
+          </span>
+        )}
         <div className="grid grid-cols-4 gap-2 bg-gray-50 p-2 eyebrow text-gray-600">
           <span>Fecha</span>
           <span>Horas</span>
@@ -377,7 +385,10 @@ export function LiquidacionView({
               }}
               key={jornada.id}
             >
-              <span>{jornada.fecha}</span>
+              <span className="flex items-center gap-1.5">
+                <DiaSemana fecha={jornada.fecha} />
+                {jornada.fecha}
+              </span>
               <span>{jornada.horas}</span>
               <span>€{jornada.destajo}</span>
               <span className="text-right font-semibold">
@@ -631,6 +642,21 @@ export function AgregarHorasView({ trabajadorId, actions, onBack }) {
         </div>
       </div>
     </Card>
+  );
+}
+
+/** La inicial del día de la semana, junto a la fecha. Fin de semana en cálido. */
+function DiaSemana({ fecha }) {
+  const dia = diaSemana(fecha);
+  if (!dia) return null;
+  return (
+    <span
+      className="eyebrow shrink-0 w-4 text-center"
+      style={{ color: dia.finde ? colors.danger : colors.muted }}
+      title={fecha}
+    >
+      {dia.letra}
+    </span>
   );
 }
 

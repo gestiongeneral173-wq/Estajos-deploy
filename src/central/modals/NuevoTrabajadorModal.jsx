@@ -9,7 +9,7 @@ export function NuevoTrabajadorModal({ open, onClose, actions }) {
       telefono: "",
       cuenta: "",
       payment_period: "mensual",
-      tarifa_hora: "",
+      tarifa_hora: "0",
     }),
     campo = (i) => (c) =>
       setForm({
@@ -31,7 +31,7 @@ export function NuevoTrabajadorModal({ open, onClose, actions }) {
         telefono: "",
         cuenta: "",
         payment_period: "mensual",
-        tarifa_hora: "",
+        tarifa_hora: "0",
       });
       onClose();
     };

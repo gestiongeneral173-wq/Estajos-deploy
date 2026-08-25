@@ -221,10 +221,17 @@ export function ListasPago({ tipo, state, actions }) {
       });
       return A;
     }, [base, state, esEmpleado]),
+    // Para empleados: solo entra quien tenga al menos una jornada sin
+    // liquidar en este ciclo. Un adelanto suelto sin jornada no cuenta, y
+    // quien ya fue pagado tampoco aparece — `calcEmpleado` ya deja fuera las
+    // jornadas liquidadas, así que "tiene jornadas" implica "no pagado".
+    // Las furgonetas mantienen la regla de saldo pendiente.
+    elegible = (id) =>
+      esEmpleado ? calculos[id].jornadas.length > 0 : calculos[id].totalPagar > 0,
     filtrados = useMemo(() => {
       const A = q.trim().toLowerCase();
       return base
-        .filter((H) => calculos[H.id].totalPagar > 0)
+        .filter((H) => elegible(H.id))
         .filter((H) => {
           const v = esEmpleado ? `${H.nombre} ${H.apellido}` : H.nombre;
           return !A || v.toLowerCase().includes(A);
@@ -267,7 +274,7 @@ export function ListasPago({ tipo, state, actions }) {
         // de la lista, no se veía y parecía que el botón no hacía nada.
         .catch(() => window.scrollTo({ top: 0, behavior: "smooth" }));
     },
-    conSaldo = base.filter((A) => calculos[A.id].totalPagar > 0),
+    conSaldo = base.filter((A) => elegible(A.id)),
     exportarCSV = () => {
       if (conSaldo.length === 0) {
         return;
@@ -306,13 +313,12 @@ export function ListasPago({ tipo, state, actions }) {
       abrirPlanilla({
         titulo: esEmpleado ? "Planilla de empleados" : "Planilla de furgonetas",
         subtitulo: `${esEmpleado && ciclo === "mensual" ? "Mensual" : "Quincenal"} · Del ${ddmm(desdeReal ?? periodo.inicio)} al ${ddmm(periodo.fin)}`,
-        columnas: ["Nombre", "Devengado", "Adelantos", "A pagar", "Firma"],
+        columnas: ["Nombre", "Total antes de adelantos", "Adelantos", "A pagar"],
         filas: conSaldo.map((h) => [
           esEmpleado ? `${h.nombre} ${h.apellido}` : h.nombre,
           eur(calculos[h.id].totalDevengado),
           eur(calculos[h.id].totalAdelantos),
           eur(calculos[h.id].totalPagar),
-          "",
         ]),
         total: conSaldo.reduce(
           (suma, h) => suma + calculos[h.id].totalPagar,

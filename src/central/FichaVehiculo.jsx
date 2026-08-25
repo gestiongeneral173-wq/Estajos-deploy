@@ -21,8 +21,23 @@ import {
   Sheet,
 } from "../components/ui/primitives.jsx";
 import { calcVehiculo } from "../lib/calculos.js";
-import { hoy } from "../lib/format.js";
+import { diaSemana, hoy } from "../lib/format.js";
 import { colors, hexToRgba } from "../theme.js";
+
+/** La inicial del día de la semana, junto a la fecha. Fin de semana en cálido. */
+function DiaSemana({ fecha }) {
+  const dia = diaSemana(fecha);
+  if (!dia) return null;
+  return (
+    <span
+      className="eyebrow shrink-0 w-4 text-center"
+      style={{ color: dia.finde ? colors.danger : colors.muted }}
+      title={fecha}
+    >
+      {dia.letra}
+    </span>
+  );
+}
 
 export function FichaVehiculo({ id, state, actions, onBack }) {
   const vehiculo = state.vehiculos.find((j) => j.id === id),
@@ -257,7 +272,10 @@ export function FichaVehiculo({ id, state, actions, onBack }) {
                 }}
                 key={dia.id}
               >
-                <span>{dia.fecha}</span>
+                <span className="flex items-center gap-1.5">
+                  <DiaSemana fecha={dia.fecha} />
+                  {dia.fecha}
+                </span>
                 {plazasEditando === dia.id ? (
                   <input
                     type="number"
