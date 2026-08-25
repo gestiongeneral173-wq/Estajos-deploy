@@ -54,15 +54,13 @@ export function RegistrosTab({ state, actions, onVerFicha }) {
           (m) => !d || `${m.nombre} ${m.apellido}`.toLowerCase().includes(d),
         )
         .map((m) => {
-          // El PIN no se puede leer: sólo se muestran sus dos últimos
-          // dígitos, que es lo que devuelve `pines_activos()`.
           const pin = pinesEncargado.find((p) => p.empleado_id === m.id);
           return {
             ...m,
             nombre: `${m.nombre} ${m.apellido}`,
             paymentPeriod: m.payment_period,
             balance: saldoEmpleado(state, m.id),
-            pin: pin ? `••${pin.ultimos}` : null,
+            pin: pin?.pin ?? null,
           };
         });
     }, [trabajadores, filtro, q, state, pinesEncargado]);

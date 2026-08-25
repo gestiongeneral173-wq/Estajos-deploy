@@ -5,21 +5,23 @@ import { CodeBadge } from "../../components/ui/Badges.jsx";
 import { Button, Input, Sheet } from "../../components/ui/primitives.jsx";
 import { colors, hexToRgba } from "../../theme.js";
 
-const fechaCorta = (iso) =>
-  iso
-    ? new Date(iso).toLocaleDateString("es-ES", {
-        day: "numeric",
-        month: "short",
-      })
-    : "—";
+// Desde 0021 los PINes no caducan: `expira_at` llega como "infinity", que
+// `new Date` no sabe leer. Devuelve null y quien pinta decide si enseña algo.
+const fechaCorta = (iso) => {
+  const d = iso ? new Date(iso) : null;
+  return d && !Number.isNaN(d.getTime())
+    ? d.toLocaleDateString("es-ES", { day: "numeric", month: "short" })
+    : null;
+};
 
 /**
  * Dar un PIN es lo que convierte a alguien en encargado, así que se elige
  * de entre todo el padrón.
  *
- * El PIN se ve UNA sola vez, justo al generarlo: la base guarda sólo su
- * hash bcrypt. Si se pierde, se genera otro — no hay forma de recuperarlo,
- * y eso es exactamente lo que se busca.
+ * El PIN queda a la vista en la lista de PINs activos: Central lo necesita
+ * para poder decírselo al encargado que lo ha olvidado. La base sigue
+ * guardando el hash bcrypt aparte, que es contra lo que se comprueba al
+ * entrar en Campo.
  */
 export function GenerarPinesModal({ open, onClose, state, actions }) {
   const { trabajadores, pinesEncargado } = state;
@@ -93,8 +95,8 @@ export function GenerarPinesModal({ open, onClose, state, actions }) {
           >
             <p className="eyebrow text-gray-600">PIN generado</p>
             <p className="text-[11px] text-gray-600 -mt-1">
-              Apúntalo ahora: no se puede volver a ver. Si se pierde, se genera
-              otro.
+              Queda a la vista en «PINs activos». Si hace falta otro, se genera
+              y el anterior deja de valer.
             </p>
 
             {generados.map(({ empleado_id, pin }) => {
@@ -254,22 +256,26 @@ export function GenerarPinesModal({ open, onClose, state, actions }) {
                         />
                       )}
                     </p>
-                    {/* Sólo los dos últimos dígitos: sirven para reconocer
-                        de cuál se habla, no para entrar. */}
                     <p
                       className="text-[11px] font-semibold tracking-widest cifra"
-                      style={{ color: colors.muted }}
-                      title={`Caduca el ${fechaCorta(p.expira_at)}`}
+                      style={{ color: colors.navyDark }}
+                      title={
+                        fechaCorta(p.expira_at)
+                          ? `Caduca el ${fechaCorta(p.expira_at)}`
+                          : "No caduca"
+                      }
                     >
-                      ••{p.ultimos}
+                      {p.pin}
                     </p>
                     <div className="flex items-center gap-2">
-                      <span
-                        className="text-[10px]"
-                        style={{ color: colors.muted }}
-                      >
-                        cad. {fechaCorta(p.expira_at)}
-                      </span>
+                      {fechaCorta(p.expira_at) && (
+                        <span
+                          className="text-[10px]"
+                          style={{ color: colors.muted }}
+                        >
+                          cad. {fechaCorta(p.expira_at)}
+                        </span>
+                      )}
                       <button
                         onClick={() =>
                           actions.eliminarPinEncargado(p.empleado_id)

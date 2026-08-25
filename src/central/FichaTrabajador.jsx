@@ -156,8 +156,8 @@ function SwitchEncargado({
         >
           <p className="eyebrow text-gray-600">PIN generado</p>
           <p className="text-[11px] text-gray-600 -mt-0.5 mb-1">
-            Apúntalo ahora: no se puede volver a ver. Si se pierde, se genera
-            otro.
+            Queda a la vista en Registros → PINs. Si hace falta otro, se genera
+            y el anterior deja de valer.
           </p>
           <p
             className="text-2xl font-semibold tracking-widest cifra"

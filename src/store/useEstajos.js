@@ -39,8 +39,12 @@ const ESTADO_VACIO = {
   listasEmpleados: [],
   listasFurgonetas: [],
   pinesEncargado: [],
-  tarifaChofer: 0,
   tarifaTemporal: 0,
+  // La regla del chofer desde 0019: quien cobre menos de `umbralChofer` €/h se
+  // lleva `plusChofer` € el día que conduce. `ajustes.tarifa_chofer`, la regla
+  // vieja, ya no se lee: ninguna pantalla la usa.
+  umbralChofer: 0,
+  plusChofer: 0,
   // El ciclo vigente de cada tipo de pago, tal como lo decide el candado global
   // de la base (`ciclo_vigente`). `cerrado` dice si ya pasó su último día, que
   // es cuando se puede empezar a cobrar.
@@ -171,7 +175,7 @@ export function useEstajos() {
         supabase.rpc("pines_activos").then(ok),
         supabase
           .from("ajustes")
-          .select("tarifa_chofer, tarifa_temporal")
+          .select("tarifa_temporal, umbral_chofer, plus_chofer")
           .maybeSingle()
           .then(ok),
         supabase.rpc("periodos_activos").then(ok),
@@ -352,10 +356,14 @@ export function useEstajos() {
           empleado_id: p.trabajador_id,
           nombre: p.nombre,
           ultimos: p.ultimos,
+          // Los PINs generados antes de 0020 solo tienen los dos ultimos
+          // digitos: se ven asi hasta que se rotan.
+          pin: p.pin ?? `••${p.ultimos}`,
           expira_at: p.expira_at,
         })),
-        tarifaChofer: Number(ajustes?.tarifa_chofer ?? 0),
         tarifaTemporal: Number(ajustes?.tarifa_temporal ?? 0),
+        umbralChofer: Number(ajustes?.umbral_chofer ?? 0),
+        plusChofer: Number(ajustes?.plus_chofer ?? 0),
         periodos: { ...ESTADO_VACIO.periodos, ...periodosUi },
       });
       setError(null);
@@ -593,7 +601,10 @@ export function useEstajos() {
       // organización aún no tiene fila en `ajustes`, el UPDATE no tocaba
       // ninguna fila, PostgREST devolvía 204 y la tarifa se quedaba en 0,00
       // sin un solo aviso. La función hace upsert y falla en voz alta.
-      setTarifaChofer: (v) => rpc("set_tarifas", { p_chofer: numero(v) }),
+      // La regla del chofer va entera de una vez: el umbral solo significa algo
+      // junto al plus. `set_tarifas` ignora los parámetros que no se le pasan.
+      setReglaChofer: (umbral, plus) =>
+        rpc("set_tarifas", { p_umbral: numero(umbral), p_plus: numero(plus) }),
 
       setTarifaTemporal: (v) => rpc("set_tarifas", { p_temporal: numero(v) }),
 

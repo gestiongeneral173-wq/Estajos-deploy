@@ -177,11 +177,16 @@ const state = {
       empleado_id: "t1",
       nombre: "Ana Encargada",
       ultimos: "42",
-      expira_at: new Date(Date.now() + 86400000 * 30).toISOString(),
+      // Los de antes de 0020 solo tienen los dos ultimos digitos.
+      pin: "••42",
+      // Desde 0021 `expira_at` llega asi: el PIN no caduca. `new Date` no lo
+      // sabe leer, y la pantalla no debe pintar "Invalid Date".
+      expira_at: "infinity",
     },
   ],
-  tarifaChofer: 10,
   tarifaTemporal: 8,
+  umbralChofer: 7,
+  plusChofer: 6,
   periodos: {
     quincenal: { inicio: HOY, fin: HOY, label: "Del 01/08 al 15/08" },
     mensual: { inicio: HOY, fin: HOY, label: "Del 01/08 al 31/08" },
@@ -371,12 +376,12 @@ const casos = [
   [
     "ConfigChoferModal",
     <ConfigChoferModal open onClose={noop} state={state} actions={actions} />,
-    ["Configurar chofer"],
+    ["Configurar chofer", "Umbral", "Plus por conducir"],
   ],
   [
     "GenerarPinesModal",
     <GenerarPinesModal open onClose={noop} state={state} actions={actions} />,
-    ["Generar PIN de encargados", "PINs activos", "••42", "Ana"],
+    ["Generar PIN de encargados", "PINs activos", "••42", "Ana", "No caduca"],
   ],
 ];
 
