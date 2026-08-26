@@ -1,14 +1,32 @@
 import { useMemo, useState } from "react";
 import { Settings, Trash2 } from "lucide-react";
 import { Button, Input, Sheet } from "../../components/ui/primitives.jsx";
+import { importeTemporal } from "../../lib/calculos.js";
 import { diaSemana, eur, hoy } from "../../lib/format.js";
 import { colors } from "../../theme.js";
 
+/**
+ * Una cifra del resumen de cabecera. Etiqueta arriba, número abajo: la misma
+ * jerarquía que el resto de Central, para que se lea de un vistazo.
+ */
+function Total({ etiqueta, valor, destacado = false }) {
+  return (
+    <div className="text-center">
+      <p className="eyebrow" style={{ color: colors.muted }}>
+        {etiqueta}
+      </p>
+      <p
+        className={`cifra ${destacado ? "text-sm font-bold" : "text-[13px] font-semibold"}`}
+        style={{ color: destacado ? colors.primary : colors.navyDark }}
+      >
+        {valor}
+      </p>
+    </div>
+  );
+}
+
 export function TemporalesModal({ open, onClose, state, actions }) {
   const { temporales, tarifaTemporal } = state,
-    // Qué temporal tiene la tarifa abierta para editar, y con qué valor.
-    [tarifaDe, setTarifaDe] = useState(null),
-    [tarifaValor, setTarifaValor] = useState(""),
     [editando, setEditando] = useState(false),
     [valor, setValor] = useState(String(tarifaTemporal)),
     [guardado, setGuardado] = useState(false),
@@ -25,11 +43,23 @@ export function TemporalesModal({ open, onClose, state, actions }) {
           ),
       [temporales, dia],
     ),
-    totalHoras = listado.reduce(
-      (n, t) => n + Number(t.horas_trabajadas || 0),
-      0,
-    ),
-    totalDestajo = listado.reduce((n, t) => n + Number(t.destajo || 0), 0),
+    // Los totales salen del mismo `listado` que pinta la tabla, así que se
+    // recalculan solos: alta o baja de un temporal y las tres cifras cambian
+    // en el mismo render. No hay contador que mantener aparte.
+    totales = useMemo(() => {
+      const redondear = (n) => Math.round(n * 100) / 100;
+      return {
+        horas: redondear(
+          listado.reduce((n, t) => n + Number(t.horas_trabajadas || 0), 0),
+        ),
+        destajo: redondear(
+          listado.reduce((n, t) => n + Number(t.destajo || 0), 0),
+        ),
+        // horas × SU tarifa + destajo, temporal a temporal. La misma fórmula
+        // que usa el resto de Central para saber qué darle a cada uno.
+        pago: redondear(listado.reduce((n, t) => n + importeTemporal(t), 0)),
+      };
+    }, [listado]),
     valido = parseFloat(valor) > 0,
     guardar = () => {
       actions.setTarifaTemporal(parseFloat(valor) || 0);
@@ -37,8 +67,12 @@ export function TemporalesModal({ open, onClose, state, actions }) {
       setGuardado(true);
       setTimeout(() => setGuardado(false), 1500);
     };
+
   return (
     <Sheet open={open} title="Ver temporales" onClose={onClose}>
+      {/* Cabecera: tarifa vigente + su botón de configuración arriba, y debajo
+          el resumen de horas y pago. Antes las cifras colgaban del mismo flex
+          que el engranaje y se apelotonaban contra el borde derecho. */}
       <div className="bg-gray-50 rounded-xl p-3 mb-4">
         {guardado && (
           <p
@@ -80,43 +114,49 @@ export function TemporalesModal({ open, onClose, state, actions }) {
             </div>
           </div>
         ) : (
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="eyebrow text-gray-500">Tarifa de temporales</p>
-              <p
-                className="text-sm font-semibold"
-                style={{
-                  color: colors.navyDark,
+          <div className="space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <div>
+                <p className="eyebrow text-gray-500">Tarifa de temporales</p>
+                <p
+                  className="text-sm font-semibold cifra"
+                  style={{
+                    color: colors.navyDark,
+                  }}
+                >
+                  {eur(tarifaTemporal)}/h
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  setValor(String(tarifaTemporal));
+                  setEditando(true);
                 }}
+                className="text-gray-500 hover:text-gray-700"
+                title="Cambiar la tarifa de temporales"
               >
-                €{Number(tarifaTemporal || 0).toFixed(2)}/h
-              </p>
+                <Settings className="w-4 h-4" />
+              </button>
             </div>
-            <button
-              onClick={() => {
-                setValor(String(tarifaTemporal));
-                setEditando(true);
-              }}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <Settings className="w-4 h-4" />
-            </button>
-            <div className="grid grid-cols-5 gap-1 pt-2 mt-1 border-t border-gray-200">
-              <p className="eyebrow" style={{ color: colors.muted }}>
-                {dia ? "Ese día" : "Total"}
+
+            <div className="pt-3 border-t border-gray-200">
+              <p className="eyebrow mb-2" style={{ color: colors.muted }}>
+                {dia ? `Totales del ${dia}` : "Totales de todos los temporales"}
               </p>
-              <p className="text-[11px] text-center font-semibold cifra">
-                {totalHoras}h
-              </p>
-              <p className="text-[11px] text-center font-semibold cifra">
-                {eur(totalDestajo)}
-              </p>
-              <p />
-              <p />
+              <div className="grid grid-cols-3 gap-2">
+                <Total etiqueta="Horas" valor={`${totales.horas}h`} />
+                <Total etiqueta="Destajo" valor={eur(totales.destajo)} />
+                <Total
+                  etiqueta="Pago total"
+                  valor={eur(totales.pago)}
+                  destacado
+                />
+              </div>
             </div>
           </div>
         )}
       </div>
+
       <div className="bg-gray-50 rounded-xl p-3">
         <p className="text-[11px] text-gray-500 mb-3">
           El listado es informativo — el encargado anota horas y destajo, el
@@ -149,8 +189,10 @@ export function TemporalesModal({ open, onClose, state, actions }) {
           </p>
         ) : (
           <div className="space-y-1">
-            <div className="grid grid-cols-5 gap-1 pb-2 border-b border-gray-100">
-              {["Nombre", "Horas", "Destajo", "Tarifa", ""].map((k, N) => (
+            {/* La tarifa por temporal ya no se lista: es la misma para todos y
+                se enseña arriba, en «Tarifa de temporales». */}
+            <div className="grid grid-cols-4 gap-1 pb-2 border-b border-gray-100">
+              {["Nombre", "Horas", "Destajo", ""].map((k, N) => (
                 <p
                   className="eyebrow text-gray-500 text-center first:text-left"
                   key={N}
@@ -161,7 +203,7 @@ export function TemporalesModal({ open, onClose, state, actions }) {
             </div>
             {listado.map((temporal) => (
               <div
-                className="grid grid-cols-5 gap-1 py-1.5 border-b border-gray-50 last:border-0 items-center"
+                className="grid grid-cols-4 gap-1 py-1.5 border-b border-gray-50 last:border-0 items-center"
                 key={temporal.id}
               >
                 <div className="min-w-0">
@@ -203,40 +245,8 @@ export function TemporalesModal({ open, onClose, state, actions }) {
                     color: colors.navyDark,
                   }}
                 >
-                  €{Number(temporal.destajo).toFixed(2)}
+                  {eur(temporal.destajo)}
                 </p>
-                {/* La tarifa se copió al crearlo; a partir de ahí es suya y se
-                    corrige aquí sin tocar la de configuración. */}
-                {tarifaDe === temporal.id ? (
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    autoFocus
-                    value={tarifaValor}
-                    onChange={(k) => setTarifaValor(k.target.value)}
-                    onBlur={() => {
-                      const n = parseFloat(tarifaValor);
-                      if (n >= 0 && n !== temporal.tarifa_hora) {
-                        actions.editarTarifaTemporal(temporal.id, n);
-                      }
-                      setTarifaDe(null);
-                    }}
-                    className="text-[11px] text-center w-full border border-gray-200 rounded px-1 py-0.5"
-                  />
-                ) : (
-                  <button
-                    onClick={() => {
-                      setTarifaDe(temporal.id);
-                      setTarifaValor(String(temporal.tarifa_hora ?? 0));
-                    }}
-                    className="text-[11px] text-center underline decoration-dotted"
-                    style={{ color: colors.navyDark }}
-                    title="Editar la tarifa de este temporal"
-                  >
-                    €{Number(temporal.tarifa_hora ?? 0).toFixed(2)}
-                  </button>
-                )}
                 <button
                   onClick={() => actions.eliminarTemporal(temporal.id)}
                   className="flex justify-end text-gray-500 hover:text-red-500"
