@@ -8,8 +8,8 @@ import { colors } from "../theme.js";
 // La firma de los que hicieron esto. No abre nada ni llama a nadie: sólo se
 // enseñan y se mueven. Escribe la contraseña al revés del usuario y salen.
 const CONJURO = ["camaron caramelo", "caramelo camaron"];
-// Los gif ya se mueven solos; el vaivén de abajo sólo los pasea. Cada uno mide
-// lo suyo, así que se pintan a tamaño natural y apoyados en la misma línea.
+// Los gif ya traen su propia animación, así que aquí no se mueve nada más.
+// Cada uno mide lo suyo: misma altura, ancho libre y apoyados en la misma línea.
 const AUTORES = [
   { nombre: "will", sprite: "/sprites/cubone.gif" },
   { nombre: "nano", sprite: "/sprites/gengar.gif" },
@@ -130,11 +130,7 @@ export function LoginCentral({ onCancel }) {
                   src={autor.sprite}
                   alt={autor.nombre}
                   className="h-16 w-auto"
-                  style={{
-                    imageRendering: "pixelated",
-                    // Desfasados para que no paseen los tres a la vez.
-                    animation: `vaiven 1.1s ease-in-out ${N * 0.22}s infinite alternate`,
-                  }}
+                  style={{ imageRendering: "pixelated" }}
                 />
                 <p className="eyebrow mt-1" style={{ color: colors.muted }}>
                   {autor.nombre}

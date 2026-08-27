@@ -82,17 +82,6 @@
   }
 }
 
-/* Vaivén del easter egg del login. `prefers-reduced-motion` de arriba ya lo
-   deja quieto, así que no hace falta apagarlo aquí. */
-@keyframes vaiven {
-  from {
-    transform: translateX(-7px);
-  }
-  to {
-    transform: translateX(7px);
-  }
-}
-
 @keyframes slideUp {
   from {
     opacity: 0;
