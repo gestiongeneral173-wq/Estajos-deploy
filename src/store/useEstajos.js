@@ -583,15 +583,6 @@ export function useEstajos() {
       eliminarTemporal: (id) =>
         mutar(() => supabase.from("temporales").delete().eq("id", id).then(ok)),
 
-      editarTarifaTemporal: (id, tarifa) =>
-        mutar(() =>
-          supabase
-            .from("temporales")
-            .update({ tarifa_hora: numero(tarifa) })
-            .eq("id", id)
-            .then(ok),
-        ),
-
       eliminarTodosLosTemporales: () =>
         mutar(() =>
           supabase.from("temporales").delete().not("id", "is", null).then(ok),

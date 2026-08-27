@@ -5,6 +5,17 @@ import { useAuth } from "./AuthProvider.jsx";
 import { Button, Input } from "../components/ui/primitives.jsx";
 import { colors } from "../theme.js";
 
+// La firma de los que hicieron esto. No abre nada ni llama a nadie: sólo se
+// enseñan y se mueven. Escribe la contraseña al revés del usuario y salen.
+const CONJURO = ["camaron caramelo", "caramelo camaron"];
+// Los gif ya se mueven solos; el vaivén de abajo sólo los pasea. Cada uno mide
+// lo suyo, así que se pintan a tamaño natural y apoyados en la misma línea.
+const AUTORES = [
+  { nombre: "will", sprite: "/sprites/cubone.gif" },
+  { nombre: "nano", sprite: "/sprites/gengar.gif" },
+  { nombre: "palomo", sprite: "/sprites/lucario.gif" },
+];
+
 /**
  * Acceso de Central: correo y contraseña contra Supabase Auth. La
  * contraseña nunca pasa por la aplicación ni por la base de negocio; la
@@ -16,6 +27,9 @@ export function LoginCentral({ onCancel }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const [entrando, setEntrando] = useState(false);
+  const conjurado =
+    correo.trim().toLowerCase() === CONJURO[0] &&
+    password.trim().toLowerCase() === CONJURO[1];
 
   const enviar = async (e) => {
     e.preventDefault();
@@ -104,6 +118,31 @@ export function LoginCentral({ onCancel }) {
             </Button>
           </div>
         </form>
+
+        {conjurado && (
+          <div
+            className="flex justify-center items-end gap-4 pt-4 mt-3 border-t border-gray-100"
+            style={{ animation: "slideUp 220ms ease-out" }}
+          >
+            {AUTORES.map((autor, N) => (
+              <div className="flex flex-col items-center" key={autor.nombre}>
+                <img
+                  src={autor.sprite}
+                  alt={autor.nombre}
+                  className="h-16 w-auto"
+                  style={{
+                    imageRendering: "pixelated",
+                    // Desfasados para que no paseen los tres a la vez.
+                    animation: `vaiven 1.1s ease-in-out ${N * 0.22}s infinite alternate`,
+                  }}
+                />
+                <p className="eyebrow mt-1" style={{ color: colors.muted }}>
+                  {autor.nombre}
+                </p>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

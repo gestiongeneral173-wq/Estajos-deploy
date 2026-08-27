@@ -393,7 +393,16 @@ const casos = [
   [
     "TemporalesModal",
     <TemporalesModal open onClose={noop} state={state} actions={actions} />,
-    ["Ver temporales", "Tarifa de temporales", "Eventual Uno"],
+    [
+      "Ver temporales",
+      "Tarifa de temporales",
+      "Eventual Uno",
+      // El resumen de cabecera: horas, destajo y lo que suman a pagar.
+      "Pago total",
+      // 6h × 8 €/h de su tarifa + 0 de destajo. Si el total deja de salir de
+      // `importeTemporal`, esta cifra cambia y el smoke lo canta.
+      "€48.00",
+    ],
   ],
   [
     "ConfigChoferModal",
@@ -428,6 +437,11 @@ for (const [nombre, elemento, textos] of casos) {
         HTML_CORTAS.has(etiqueta),
         `etiqueta desconocida <${etiqueta}>`,
       );
+    }
+    // El easter egg de los autores sólo sale con el conjuro escrito: en el
+    // login recién abierto no puede haber ni rastro.
+    if (nombre === "LoginCentral") {
+      assert.ok(!/\/sprites\/|palomo/i.test(html), "easter egg a la vista");
     }
     // Ningún PIN en claro debe llegar nunca a una pantalla de listado.
     if (nombre === "GenerarPinesModal" || nombre === "RegistrosTab") {
